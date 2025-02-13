@@ -90,17 +90,20 @@ function About() {
                 }}/>
                 <p style={{
                 position: "absolute",
-                top: "12%",
+                top: "20%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                fontSize: "clamp(18px, 6vw, 1000px)",
+                fontSize: "clamp(18px, 5vw, 60px)",
                 color: "#333333",
                 padding: "10px 20px",
                 borderRadius: "8px",
                 textAlign: "center",
                 fontWeight: "bold",
-                whiteSpace: "nowrap",
-                maxWidth: "90%"
+                whiteSpace: "normal",
+                maxWidth: "90%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
                 }}>Python Charmers</p>
             </div>
         </div>

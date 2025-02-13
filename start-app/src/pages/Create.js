@@ -57,7 +57,7 @@ function Create() {
             <form className="Registration" onSubmit={handleSubmit(onSubmit)}>
                 <input type="text" placeholder='Username' {...register("username", { required: true})}
                 style={{
-                    width: "100%", 
+                    width: "95%", 
                     padding: "10px",
                     marginBottom: "10px",
                     borderRadius: "5px",
@@ -74,7 +74,7 @@ function Create() {
                     <input type={(showPassword === false) ? "password" : "text"} placeholder='Password' {...register("password", 
                         { required: true})} onChange={e => setPassword(e.target.value)}
                         style={{
-                            width: "100%", 
+                            width: "95%", 
                             padding: "10px",
                             marginBottom: "10px",
                             borderRadius: "5px",
@@ -91,7 +91,7 @@ function Create() {
                         *password* is mandatory</span>}
                     <div
                     style={{
-                        width: "105%",
+                        width: "100%",
                     }}>
                     <ProgressBar password={password} />
                     </div>
@@ -99,7 +99,7 @@ function Create() {
                         validate: value => value === passwordWatch || "passwords do not match"
                      })}
                      style={{
-                        width: "100%", 
+                        width: "95%", 
                         padding: "10px",
                         marginBottom: "10px",
                         borderRadius: "5px",

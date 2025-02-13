@@ -25,8 +25,10 @@ function About() {
                     boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
                     width: "300px",
                     textAlign: "center"
-                }}><p style= {{fontSize: "30px"}}><strong>Team #</strong><br></br> 06</p>
+                }}>
+                    <p style= {{fontSize: "30px"}}><strong>Team #</strong><br></br> 06</p>
             </div>
+
             <div style={{
                     backgroundColor: "#fff",
                     borderRadius: "8px",
@@ -34,7 +36,10 @@ function About() {
                     boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
                     width: "300px",
                     textAlign: "center"
-                }}><p style={{fontSize:"30px"}}><strong>Version #</strong> <br></br>02</p></div>
+                }}>
+                    <p style={{fontSize:"30px"}}><strong>Version #</strong> <br></br>03</p>
+            </div>
+
                 <div style={{
                     backgroundColor: "#fff",
                     borderRadius: "8px",
@@ -42,7 +47,9 @@ function About() {
                     boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
                     width: "300px",
                     textAlign: "center"
-                }}><p style={{fontSize:"30px"}}><strong>Release Date</strong> <br></br>02/13/2025</p></div>
+                }}>
+                    <p style={{fontSize:"30px"}}><strong>Release Date</strong> <br></br>02/20/2025</p>
+                </div>
                 <div style={{
                     backgroundColor: "#fff",
                     borderRadius: "8px",
@@ -58,15 +65,18 @@ function About() {
                     boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
                     width: "1025px",
                     textAlign: "left",
-                }}><p style={{fontSize:"20px"}}><strong>Product Description:</strong> A web-based platform designed to incentivize and reward truck drivers for safe and efficient driving behaviors.</p></div>
+                }}><p style={{fontSize:"20px"}}><strong>Product Description:</strong> A web-based platform designed 
+                to incentivize and reward truck drivers for safe and efficient driving behaviors.</p></div>
             </div>
             <Link to="/">
                 <button style={{
-                    backgroundColor: "F56600",
+                    backgroundColor: "#F56600",
                     color: "#FFFFFF",
                     border: "none",
                     fontsize: "20px",
                     borderRadius: "5px",
+                    padding: "10px 20px",
+                    cursor: "pointer",
                     transition: "background-color 0.3 ease",
                 }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}

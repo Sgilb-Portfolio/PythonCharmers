@@ -56,7 +56,7 @@ const ProgressBar = ({password}) => {
         <>
             <div style={{
                 width: "100%",
-                maxWidth: "300px",
+                maxWidth: "1000px",
                 backgroundColor: "#ddd",
                 overflow: "hidden",
                 height: "7px",

@@ -67,6 +67,18 @@ function Create() {
                     *username* is mandatory</span>}
                 <br />
 
+                <input type="email" placeholder='Email' {...register("email", { required: true})}
+                style={{
+                    width: "95%", 
+                    padding: "10px",
+                    marginBottom: "10px",
+                    borderRadius: "5px",
+                    border: "1px solid #333333"}}>
+                </input>
+                {errors.email && <span style={{ color: "red", display: "block" }}>
+                    *email* is mandatory</span>}
+                <br />
+
                 <div className="passwords" 
                     style={{
                     position: "relative"

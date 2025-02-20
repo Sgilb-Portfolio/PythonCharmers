@@ -1,13 +1,10 @@
-from django.contrib import admin
-from .models import Sponsor
+from django.db import models
 
-# Register your models here.
+class Sponsor(models.Model):
+    FName = models.CharField(max_length=100)
+    LName = models.CharField(max_length=100)
+    AccountID = models.IntegerField
+    OrgID = models.IntegerField
 
-#@admin.register(Account)
-#class AccountAdmin(admin.ModelAdmin):
-    #list_display = ('account_id', 'account_username', 'account_type')
-    #list_filter = ('account_type',)
-    #search_fields = ('account_username',)
-    #ordering = ('account_id',) # orders users by account id in asc 
-
-# admin.site.register(Sponsor)
+def __str__(self):
+ return self.LName

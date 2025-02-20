@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .models import Driver
 
 # Register your models here.
 
@@ -8,3 +9,5 @@ from django.contrib import admin
     #list_filter = ('account_type',)
     #search_fields = ('account_username',)
     #ordering = ('account_id',) # orders users by account id in asc 
+
+# admin.site.register(Driver)

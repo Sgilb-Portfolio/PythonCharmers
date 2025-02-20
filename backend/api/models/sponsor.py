@@ -1,5 +1,4 @@
 from django.contrib import admin
-from .models import Driver
 from .models import Sponsor
 
 # Register your models here.
@@ -11,4 +10,4 @@ from .models import Sponsor
     #search_fields = ('account_username',)
     #ordering = ('account_id',) # orders users by account id in asc 
 
-# admin.site.register(Driver)
+# admin.site.register(Sponsor)

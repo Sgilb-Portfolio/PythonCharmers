@@ -1,42 +1,67 @@
-import React from "react";
-import { Form, Link } from "react-router-dom";
-import { FaUser, FaLock } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaUser } from "react-icons/fa";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import '../App.css';
 
 function Login() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+
+
+    useEffect(() => {
+        document.title = "Login Page";
+    }, []);
+
+    const handleShowPassword = () => {
+        setShowPassword((prev) => !prev);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setErrorMessage("Invalid Credentials");
+    }
+
     return (
         <div className='login'>
-            <form action="">
-                <div>
-                    <title>Login Page</title>
-                    <h1>Login Page</h1>
-                    <div className="input-box">
-                        <input type="text" placeholder='Username' required />
-                        <FaUser className="icon" />
-                    </div>
-                    <div className="input-box">
-                        <input type="password" placeholder='Password' required />
-                        <FaLock className="icon" />
+            <form onSubmit={handleSubmit}>
+                <h1>Login Page</h1>
+                <div className="input-box">
+                    <input type="text" placeholder='Username' required />
+                    <FaUser className="icon" />
+                </div>
 
-                    </div>
+                <div className="input-box passwords">
+                    <input 
+                        type={showPassword ? "text" : "password"} 
+                        placeholder='Password' 
+                        required 
+                    />
+                    <span className="password-eye" onClick={handleShowPassword}>
+                        {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
+                    </span>
+                </div>
 
-                    <div className="remember-forgot">
-                        <label><input type="checkbox" />Remember me</label>
-                        <a href="#">Forgot Password</a>
-                    </div>
+                {errorMessage && <div className="error-message">{errorMessage}</div>}
 
-                    <button type="submit">Login</button>
+                <div className="remember-forgot">
+                    <label><input type="checkbox" />Remember me</label>
+                    <a href="#">Forgot Password</a>
+                </div>
 
-                    <div className="register-link">
-                        <p>Don't have an account? <a href="/account-creation">Register</a></p>
-                    </div>
-                    <Link to="/">
-                        <button>Home</button>
-                    </Link>
+                <button type="submit">Login</button>
+
+                <div className="register-link">
+                    <p>Don't have an account? <a href="/account-creation">Register</a></p>
                 </div>
             </form>
-        </div>
 
+            <div className="home-link">
+                <Link to="/">
+                    <button>Home</button>
+                </Link>
+            </div>
+        </div>
     );
 }
 

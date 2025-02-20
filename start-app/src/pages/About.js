@@ -6,12 +6,20 @@ import { useEffect, useState } from "react";
 function About() {
 
     const [data, setData] = useState(null);
+    const [aboutdata, setAboutData] = useState([]);
 
     useEffect(() => {
         fetch("http://127.0.0.1:8000/api/about")
             .then(response => response.json())
             .then(data => setData(data))
             .catch(error => console.error("Error:", error));
+    }, []);
+
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/api/aboutdata/")
+            .then(response => response.json())
+            .then(data => setAboutData(data))
+            .catch(error => console.error("Error fetching data:", error));
     }, []);
 
     return (
@@ -37,7 +45,7 @@ function About() {
                     width: "300px",
                     textAlign: "center"
                 }}>
-                    <p style= {{fontSize: "30px"}}><strong>Team #</strong><br></br> 06</p>
+                    <p style= {{fontSize: "30px"}}><strong>Team #</strong><br></br>{aboutdata.teamNum}</p>
             </div>
 
             <div style={{
@@ -48,7 +56,7 @@ function About() {
                     width: "300px",
                     textAlign: "center"
                 }}>
-                    <p style={{fontSize:"30px"}}><strong>Version #</strong> <br></br>03</p>
+                    <p style={{fontSize:"30px"}}><strong>Version #</strong> <br></br>{aboutdata.versionNum}</p>
             </div>
 
                 <div style={{
@@ -59,7 +67,7 @@ function About() {
                     width: "300px",
                     textAlign: "center"
                 }}>
-                    <p style={{fontSize:"30px"}}><strong>Release Date</strong> <br></br>02/20/2025</p>
+                    <p style={{fontSize:"30px"}}><strong>Release Date</strong> <br></br>{aboutdata.releaseDate}</p>
                 </div>
                 <div style={{
                     backgroundColor: "#fff",
@@ -68,7 +76,7 @@ function About() {
                     boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
                     width: "1025px",
                     textAlign: "left"
-                }}><p style={{fontSize:"20px"}}><strong>Project Name:</strong> Good Driver Incentive Program</p></div>
+                }}><p style={{fontSize:"20px"}}><strong>Project Name:</strong> {aboutdata.productName}</p></div>
                 <div style={{
                     backgroundColor: "#fff",
                     borderRadius: "8px",
@@ -76,8 +84,7 @@ function About() {
                     boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
                     width: "1025px",
                     textAlign: "left",
-                }}><p style={{fontSize:"20px"}}><strong>Product Description:</strong> A web-based platform designed 
-                to incentivize and reward truck drivers for safe and efficient driving behaviors.</p></div>
+                }}><p style={{fontSize:"20px"}}><strong>Product Description:</strong> {aboutdata.productDesc}</p></div>
             </div>
             <Link to="/">
                 <button style={{

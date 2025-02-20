@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.urls import path
 from api.views import about
+from api.views import get_aboutdata
 
 urlpatterns = [
     path('api/about/', about, name='about'),
+    path('api/aboutdata/', get_aboutdata, name='get_aboutdata'),
 ]

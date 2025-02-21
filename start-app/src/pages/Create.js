@@ -95,7 +95,7 @@ function Create() {
                         style={{
                             position: "absolute", 
                             right: "10px", 
-                            top: "10px", 
+                            top: "20px", 
                             cursor: "pointer"}}>
                             {(showPassword) ? <AiFillEye /> : <AiFillEyeInvisible />}
                     </span>

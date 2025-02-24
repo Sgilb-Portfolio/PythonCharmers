@@ -9,14 +9,14 @@ function About() {
     const [aboutdata, setAboutData] = useState([]);
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/about")
+        fetch("http://44.202.51.190:8080/api/about")
             .then(response => response.json())
             .then(data => setData(data))
             .catch(error => console.error("Error:", error));
     }, []);
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/aboutdata/")
+        fetch("http://44.202.51.190:8080/api/aboutdata/")
             .then(response => response.json())
             .then(data => setAboutData(data))
             .catch(error => console.error("Error fetching data:", error));

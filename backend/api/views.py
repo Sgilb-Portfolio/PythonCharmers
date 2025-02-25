@@ -61,20 +61,25 @@ def create_account(request):
 
 @csrf_exempt 
 def login(request):
-    data = json.loads(request.body)
-    username = data.get("username")
-    password = data.get("password")
-
-    user = authenticate(username=username, password=password)
-
-    if user is not None:
-        # Generate a JWT token for authentication
-        payload = {
-            'id': user.id,
-            'username': user.username,
-            'exp': datetime.now() + timedelta(days=1),  # Token expires in 1 day
-        }
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
-        return JsonResponse({"token": token, "message": "Login successful!"}, status=status.HTTP_200_OK)
-
-    return JsonResponse({'error': 'Invalid request'}, status=405)
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
+            try:
+                user = Account.objects.get(account_username=username)
+                if user.account_password == password:
+                    payload = {
+                        'id': user.account_id,
+                        'username': user.account_username,
+                        'exp': datetime.utcnow() + timedelta(days=1),
+                    }
+                    token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+                    return JsonResponse({"token": token, "message": "Login successful!"}, status=status.HTTP_200_OK)
+                else:
+                    return JsonResponse({"error": "Invalid credentials"}, status=401)
+            except Account.DoesNotExist:
+                return JsonResponse({"error": "User not found"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+    return JsonResponse({'error': 'Method not allowed'}, status=405)

@@ -16,7 +16,7 @@ function Create() {
     // const onSubmit = (data) => console.log(data);
     const onSubmit = async (data) => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/create-account/", {  // Update URL if needed
+            const response = await fetch("http://44.202.51.190:8000/api/create-account/", {  // Update URL if needed
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

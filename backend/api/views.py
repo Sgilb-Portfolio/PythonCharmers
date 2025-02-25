@@ -58,6 +58,8 @@ def create_account(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
         
+
+@csrf_exempt 
 def login(request):
     username = request.data.get("username")
     password = request.data.get("password")

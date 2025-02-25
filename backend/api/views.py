@@ -1,8 +1,14 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.db import connection
+from django.contrib.auth import authenticate
 from .models import AboutData
-from django.views.decorators.csrf import csrf_exempt    
+from django.views.decorators.csrf import csrf_exempt   
+import jwt
+from datetime import datetime, timedelta
+from rest_framework_simplejwt.tokens import RefreshToken 
+from django.conf import settings  # For SECRET_KEY
+from rest_framework import status  # For HTTP status codes
 import json                                             
 from .models import Account                             
 
@@ -51,5 +57,21 @@ def create_account(request):
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
+        
+def login(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+
+    user = authenticate(username=username, password=password)
+
+    if user is not None:
+        # Generate a JWT token for authentication
+        payload = {
+            'id': user.id,
+            'username': user.username,
+            'exp': datetime.now() + timedelta(days=1),  # Token expires in 1 day
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+        return JsonResponse({"token": token, "message": "Login successful!"}, status=status.HTTP_200_OK)
 
     return JsonResponse({'error': 'Invalid request'}, status=405)

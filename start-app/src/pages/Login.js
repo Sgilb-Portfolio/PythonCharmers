@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import '../App.css';
 import CheckBox from '../components/CheckBox';
+
 function Login() {
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [errorMessage, setMessage] = useState("")
     const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const navigate = useNavigate()
 
     useEffect(() => {
         document.title = "Login Page";
@@ -15,10 +20,39 @@ function Login() {
         setShowPassword((prev) => !prev);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setErrorMessage("Invalid Credentials");
+        setMessage(""); // Clear previous messages
+
+        try {
+            const response = await fetch("http://44.202.51.190:8000/api/login/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setMessage("Login successful!");
+                setTimeout(() => navigate("/about"), 1000); // Redirect after success
+            } else {
+                setMessage(data.error || "Invalid credentials");
+            }
+        } catch (error) {
+            setMessage("An error occurred. Please try again.");
+        }
     };
+
+
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     setErrorMessage("Invalid Credentials");
+    // };
+
+
 
     return (
         <div style={{
@@ -90,7 +124,7 @@ function Login() {
 
                     {errorMessage && <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>}
 
-                    <CheckBox label = "Remember Me"/>
+                    <CheckBox label="Remember Me" />
 
                     <input type="submit" value="Login"
                         style={{
@@ -100,7 +134,7 @@ function Login() {
                             border: "none",
                             padding: "10px",
                             fontSize: "18px",
-                            
+
                             borderRadius: "5px",
                             cursor: "pointer",
                             transition: "background-color 0.3s ease"
@@ -113,12 +147,12 @@ function Login() {
                 <p style={{
                     color: "#333333"
                 }
-                }>Don't have an account? <Link to="/account-creation" 
-                style={{ 
-                    color: "#F56600",
-                    cursor: "pointer",
+                }>Don't have an account? <Link to="/account-creation"
+                    style={{
+                        color: "#F56600",
+                        cursor: "pointer",
                     }}>
-                    Register</Link></p>
+                        Register</Link></p>
             </div>
         </div>
     );

@@ -92,7 +92,9 @@ function Login() {
                 textAlign: "center"
             }}>
                 <form onSubmit={handleSubmit}>
-                    <input type="text" placeholder='Username' required
+                    <input type="text" placeholder='Username' value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
                         style={{
                             width: "95%",
                             padding: "10px",
@@ -103,7 +105,10 @@ function Login() {
                     <br />
 
                     <div className="passwords" style={{ position: "relative" }}>
-                        <input type={showPassword ? "text" : "password"} placeholder='Password' required
+                        <input type={showPassword ? "text" : "password"} placeholder='Password'
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)} 
+                            required
                             style={{
                                 width: "95%",
                                 padding: "10px",

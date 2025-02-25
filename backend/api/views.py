@@ -2,9 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db import connection
 from .models import AboutData
-from django.views.decorators.csrf import csrf_exempt    #new
-import json                                             #new
-from .models import Account                             #new
+from django.views.decorators.csrf import csrf_exempt    
+import json                                             
+from .models import Account                             
 
 def about(request):
     try:
@@ -28,6 +28,7 @@ def get_aboutdata(request):
     }
     return JsonResponse(response_data)
 
+@csrf_exempt
 def create_account(request):
     if request.method == 'POST':
         try:

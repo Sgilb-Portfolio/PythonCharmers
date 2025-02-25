@@ -61,8 +61,9 @@ def create_account(request):
 
 @csrf_exempt 
 def login(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
+    data = json.loads(request.body)
+    username = data.get("username")
+    password = data.get("password")
 
     user = authenticate(username=username, password=password)
 

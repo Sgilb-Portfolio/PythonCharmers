@@ -22,5 +22,5 @@ from api.views import create_account
 urlpatterns = [
     path('api/about/', about, name='about'),
     path('api/aboutdata/', get_aboutdata, name='get_aboutdata'),
-    path('api/create-account/', create_account, name='create-account'),
+    path('api/create-account/', create_account, name='create_account'),
 ]

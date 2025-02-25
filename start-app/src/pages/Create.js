@@ -8,12 +8,37 @@ import ProgressBar from "../components/ProgressBar";
 function Create() {
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const passwordWatch = watch("password");
-    const onSubmit = (data) => console.log(data);
     const [showPassword, setShowPassword] = useState(false)
     const handleShowPassword = () => {
         setShowPassword(!showPassword)
     }
     const [password, setPassword] = useState("")
+    // const onSubmit = (data) => console.log(data);
+    const onSubmit = async (data) => {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/api/create-account/", {  // Update URL if needed
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: data.username,
+                    password: data.password
+                }),
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                alert(`Account created! Your ID is ${result.account_id}`);
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error("Error creating account:", error);
+            alert("Something went wrong. Please try again.");
+        }
+    };
 
     return (
 

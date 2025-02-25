@@ -17,8 +17,10 @@ Including another URLconf
 from django.urls import path
 from api.views import about
 from api.views import get_aboutdata
+from api.views import create_account
 
 urlpatterns = [
     path('api/about/', about, name='about'),
     path('api/aboutdata/', get_aboutdata, name='get_aboutdata'),
+    path('api/create-account/', create_account, name='create-account'),
 ]

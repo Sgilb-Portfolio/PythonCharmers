@@ -19,35 +19,34 @@ function Home() {
     }, [images.length]);
 
     const carouselStyle = {
-        width: "25%",  // Adjust the width of the carousel
-        height: "auto", // Adjust height based on image aspect ratio
+        width: "25%",  
+        height: "auto", 
         position: "relative",
         overflow: "hidden",
         margin: "20px 0",
     };
 
     const imageStyle = {
-        width: "100%",   // Ensure image scales to 100% width of the container
-        height: "100%",  // Let the height adjust automatically based on the width
-        objectFit: "contain",  // Keeps the entire image visible without cropping
+        width: "100%", 
+        height: "100%",  
+        objectFit: "contain",
     };
 
-    // Container style for centering everything
+    
     const containerStyle = {
-        display: "flex",          // Apply flexbox
-        flexDirection: "column",  // Stack elements vertically
-        justifyContent: "center", // Center content vertically
-        alignItems: "center",     // Center content horizontally
-        minHeight: "100vh",       // Ensure the container takes up the full height of the viewport
-        textAlign: "center",      // Center the text
+        display: "flex",         
+        flexDirection: "column", 
+        justifyContent: "center", 
+        alignItems: "center",
+        minHeight: "100vh",
+        textAlign: "center",
     };
 
-    // Button container to center and space out the buttons
     const buttonContainerStyle = {
         display: "flex",
-        justifyContent: "center", // Center buttons horizontally
-        gap: "20px",              // Add space between buttons
-        marginBottom: "20px",     // Optional: Add space below the buttons
+        justifyContent: "center",
+        gap: "20px",   
+        marginBottom: "20px",  
     };
 
     return (

@@ -82,7 +82,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 #     }
 # }
 db_username = "admin"
-db_password = "b!tQOIdCiU3WzMOQ6"
+db_password = "4911Admin2025"
 
 DATABASES = {
     "default": {
@@ -90,7 +90,7 @@ DATABASES = {
         "NAME": "demodb",
         "USER": db_username,
         "PASSWORD": db_password,
-        "HOST": "cpsc4910-team06.cobd8enwsupz.us-east-1.rds.amazonaws.com",
+        "HOST": "cpsc4911.cobd8enwsupz.us-east-1.rds.amazonaws.com",
         "PORT": "3306",
     }
 }

@@ -16,7 +16,7 @@ function Login() {
     useEffect(() => {
         document.title = "Login Page";
 
-    const savedUsername = localStorage.getItem("savedUsername");
+        const savedUsername = localStorage.getItem("savedUsername");
         if (savedUsername) {
             setUsername(savedUsername);
             setRememberMe(true);
@@ -33,7 +33,7 @@ function Login() {
 
         try {
             const response = await fetch("http://44.202.51.190:8000/api/login/", {
-            // const response = await fetch("http://localhost:8000/api/login-cognito/", {
+                // const response = await fetch("http://localhost:8000/api/login-cognito/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -120,7 +120,7 @@ function Login() {
                     <div className="passwords" style={{ position: "relative" }}>
                         <input type={showPassword ? "text" : "password"} placeholder='Password'
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)} 
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                             style={{
                                 width: "95%",
@@ -143,6 +143,13 @@ function Login() {
                     {errorMessage && <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>}
 
                     <CheckBox label="Remember Me" onChange={handleRememberMeChange} />
+
+                    <p>
+                        <Link to="/reset-password" style={{ color: "#F56600", cursor: "pointer" }}>
+                            Forgot Password?
+                        </Link>
+                    </p>
+
 
                     <input type="submit" value="Login"
                         style={{

@@ -9,8 +9,9 @@ from datetime import datetime, timedelta
 from rest_framework_simplejwt.tokens import RefreshToken 
 from django.conf import settings  # For SECRET_KEY
 from rest_framework import status  # For HTTP status codes
+from django.contrib.auth.hashers import make_password
 import json                                             
-from .models import Account    
+from .models import Account
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
 
 def about(request):
@@ -114,6 +115,31 @@ def login_user(request):
             return JsonResponse(auth_result, status=401)
         return JsonResponse(auth_result)
     
+def reset_password(request):
+    """
+    API endpoint to reset user password.
+    Expects JSON with 'username', 'new_password', and 'confirm_password'.
+    """
+    username = request.data.get("username")
+    new_password = request.data.get("new_password")
+    confirm_password = request.data.get("confirm_password")
+
+    if not username or not new_password or not confirm_password:
+        return JsonResponse({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if new_password != confirm_password:
+        return JsonResponse({"error": "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = Account.objects.get(username=username)
+        user.password = make_password(new_password)  # Hash the password before saving
+        user.save()
+        return JsonResponse({"message": "Password updated successfully!"}, status=status.HTTP_200_OK)
+
+    except Account.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+ 
+
 @csrf_exempt
 def protected_view(request):
     """Example protected route that requires a valid token"""

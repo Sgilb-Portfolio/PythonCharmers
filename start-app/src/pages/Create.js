@@ -16,7 +16,28 @@ function Create() {
     // const onSubmit = (data) => console.log(data);
     const onSubmit = async (data) => {
         try {
-            const response = await fetch("http://44.202.51.190:8000/api/create-account/", {  // Update URL if needed
+            const cognitoResponse = await fetch("http://localhost:8000/api/register-cognito/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: data.username,
+                    password: data.password,
+                    email: data.email
+                }),
+            });
+    
+            const cognitoResult = await cognitoResponse.json();
+    
+            if (!cognitoResponse.ok) {
+                alert(`Cognito Error: ${cognitoResult.error}`);
+                return;
+            }
+
+
+            //const response = await fetch("http://44.202.51.190:8000/api/create-account/", {  // Update URL if needed
+            const dbresponse = await fetch("http://localhost:8000/api/create-account/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -27,12 +48,12 @@ function Create() {
                 }),
             });
     
-            const result = await response.json();
+            const dbresult = await dbresponse.json();
     
-            if (response.ok) {
-                alert(`Account created! Your ID is ${result.account_id}`);
+            if (dbresponse.ok) {
+                alert(`Account created! Your ID is ${dbresult.account_id}`);
             } else {
-                alert(`Error: ${result.error}`);
+                alert(`Error: ${dbresult.error}`);
             }
         } catch (error) {
             console.error("Error creating account:", error);

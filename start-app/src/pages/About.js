@@ -7,21 +7,47 @@ function About() {
 
     const [data, setData] = useState(null);
     const [aboutdata, setAboutData] = useState([]);
+    const [errorMessage, setErrorMessage] = useState([]);
+    const idToken = localStorage.getItem("IdToken");
 
     useEffect(() => {
-        fetch("http://44.202.51.190:8000/api/about")
+        if (!idToken) {
+            setErrorMessage("You must be logged in to access this page.");
+            return;
+        }
+
+        //fetch("http://44.202.51.190:8000/api/about", {
+        fetch("http://localhost:8000/api/about", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${idToken}`, // Send the token here
+                "Content-Type": "application/json",
+            },
+        })
             .then(response => response.json())
             .then(data => setData(data))
-            .catch(error => console.error("Error:", error));
-    }, []);
+            .catch(error => {
+                console.error("Error:", error);
+                setErrorMessage("An error occurred while fetching data.");
+            });
 
-    useEffect(() => {
-        fetch("http://44.202.51.190:8000/api/aboutdata/")
+        //fetch("http://44.202.51.190:8000/api/aboutdata/", {
+        fetch("http://localhost:8000/api/aboutdata/", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${idToken}`, // Include token in header
+                "Content-Type": "application/json",
+            },
+        })
             .then(response => response.json())
             .then(data => setAboutData(data))
-            .catch(error => console.error("Error fetching data:", error));
-    }, []);
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                setErrorMessage("An error occurred while fetching about data.");
+            });
+    }, [idToken]);
 
+    
     return (
         <div style={{ textAlign: "center", 
         padding: "20px", 

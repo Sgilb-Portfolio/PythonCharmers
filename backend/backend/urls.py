@@ -19,10 +19,15 @@ from api.views import about
 from api.views import get_aboutdata
 from api.views import create_account
 from api.views import login
+from api.views import register_user, confirm_user, login_user, protected_view
 
 urlpatterns = [
     path('api/about/', about, name='about'),
     path('api/aboutdata/', get_aboutdata, name='get_aboutdata'),
     path('api/create-account/', create_account, name='create_account'),
     path('api/login/', login, name='login'),
+    path("api/register-cognito/", register_user, name="register_cognito"),
+    path("api/confirm-cognito/", confirm_user, name="confirm_cognito"),
+    path("api/login-cognito/", login_user, name="login_cognito"),
+    path("api/protected-cognito/", protected_view, name="protected_cognito"),
 ]

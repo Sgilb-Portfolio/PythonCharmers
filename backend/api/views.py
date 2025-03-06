@@ -10,7 +10,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings  # For SECRET_KEY
 from rest_framework import status  # For HTTP status codes
 import json                                             
-from .models import Account                             
+from .models import Account    
+from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
 
 def about(request):
     try:
@@ -83,3 +84,44 @@ def login(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON format'}, status=400)
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+"""Cognito functions"""
+@csrf_exempt
+def register_user(request):
+    """Handles user registration"""
+    if request.method == "POST":
+        data = json.loads(request.body)
+        response = sign_up(data["username"], data["password"], data["email"])
+        print("response:", response)
+        return JsonResponse(response)
+    
+@csrf_exempt
+def confirm_user(request):
+    """Handles user confirmation after sign-up"""
+    if request.method == "POST":
+        data = json.loads(request.body)
+        response = confirm_sign_up(data["username"], data["confirmation_code"])
+        return JsonResponse(response)
+    
+@csrf_exempt
+def login_user(request):
+    """Handles user login and returns JWT tokens"""
+    if request.method == "POST":
+        data = json.loads(request.body)
+        auth_result = sign_in(data["username"], data["password"])
+        if "error" in auth_result:
+            return JsonResponse(auth_result, status=401)
+        return JsonResponse(auth_result)
+    
+@csrf_exempt
+def protected_view(request):
+    """Example protected route that requires a valid token"""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return JsonResponse({"error": "Missing or invalid token"}, status=401)
+    token = auth_header.split(" ")[1]
+    user_info = verify_token(token)
+    if "error" in user_info:
+        return JsonResponse(user_info, status=401)
+    return JsonResponse({"message": "Access granted!", "user": user_info})

@@ -25,7 +25,8 @@ function Login() {
         setMessage(""); // Clear previous messages
 
         try {
-            const response = await fetch("http://44.202.51.190:8000/api/login/", {
+            //const response = await fetch("http://44.202.51.190:8000/api/login/", {
+            const response = await fetch("http://localhost:8000/api/login-cognito/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -34,15 +35,19 @@ function Login() {
             });
 
             const data = await response.json();
+            console.log("Login Response:", data);
 
             if (response.ok) {
+                localStorage.setItem("IdToken", data.IdToken);
+                localStorage.setItem("AccessToken", data.AccessToken);
+                localStorage.setItem("RefreshToken", data.RefreshToken);
                 setMessage("Login successful!");
                 setTimeout(() => navigate("/about"), 1000); // Redirect after success
             } else {
-                setMessage(data.error || "Invalid credentials");
+                setMessage(data.error || "Invalid credentials. Please try again.");
             }
         } catch (error) {
-            setMessage("An error occurred. Please try again.");
+            setMessage("An error occurred. Please try again later.");
         }
     };
 

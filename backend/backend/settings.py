@@ -157,3 +157,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ),
 }
+
+AWS_COGNITO_USER_POOL_ID = "us-east-1_8y6CT9mZ1"
+AWS_COGNITO_CLIENT_ID = "7uqdp7n48km4fgkcceuk6ei3mf"
+AWS_COGNITO_REGION = "us-east-1"
+AWS_COGNITO_ISSUER = f"https://cognito-idp.{AWS_COGNITO_REGION}.amazonaws.com/{AWS_COGNITO_USER_POOL_ID}"

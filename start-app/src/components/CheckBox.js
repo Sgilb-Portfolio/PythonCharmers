@@ -48,7 +48,6 @@ const CheckBox = ({ label, onChange }) => {
                 }}
                 onClick={(e) => e.preventDefault()} // Prevent default action for the button (optional)
             >
-                Forgot Password?
             </button>
         </div>
     );

@@ -10,10 +10,17 @@ function Login() {
     const [password, setPassword] = useState("")
     const [errorMessage, setMessage] = useState("")
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const navigate = useNavigate()
 
     useEffect(() => {
         document.title = "Login Page";
+
+    const savedUsername = localStorage.getItem("savedUsername");
+        if (savedUsername) {
+            setUsername(savedUsername);
+            setRememberMe(true);
+        }
     }, []);
 
     const handleShowPassword = () => {
@@ -41,6 +48,11 @@ function Login() {
                 localStorage.setItem("IdToken", data.IdToken);
                 localStorage.setItem("AccessToken", data.AccessToken);
                 localStorage.setItem("RefreshToken", data.RefreshToken);
+                if (rememberMe) {
+                    localStorage.setItem("savedUsername", username);
+                } else {
+                    localStorage.removeItem("savedUsername");
+                }
                 setMessage("Login successful!");
                 setTimeout(() => navigate("/about"), 1000); // Redirect after success
             } else {
@@ -51,13 +63,9 @@ function Login() {
         }
     };
 
-
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     setErrorMessage("Invalid Credentials");
-    // };
-
-
+    const handleRememberMeChange = (e) => {
+        setRememberMe(e.target.checked);
+    };
 
     return (
         <div style={{
@@ -134,7 +142,7 @@ function Login() {
 
                     {errorMessage && <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>}
 
-                    <CheckBox label="Remember Me" />
+                    <CheckBox label="Remember Me" onChange={handleRememberMeChange} />
 
                     <input type="submit" value="Login"
                         style={{

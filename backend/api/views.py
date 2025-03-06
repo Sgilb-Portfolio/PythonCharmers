@@ -117,10 +117,6 @@ def login_user(request):
 
 @csrf_exempt 
 def reset_password(request):
-    """
-    API endpoint to reset user password.
-    Expects JSON with 'username', 'new_password', and 'confirm_password'.
-    """
     if request.method == "POST":
         try:
             data = json.loads(request.body)  
@@ -136,7 +132,7 @@ def reset_password(request):
 
             try:
                 user = Account.objects.get(username=username)
-                user.password = make_password(new_password)  
+                user.password = make_password(new_password)  # Hash the new password
                 user.save()
                 return JsonResponse({"message": "Password updated successfully!"}, status=200)
 
@@ -147,7 +143,6 @@ def reset_password(request):
             return JsonResponse({"error": "Invalid JSON format."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
- 
 
 @csrf_exempt
 def protected_view(request):

@@ -23,7 +23,7 @@ function ResetPassword() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, new_password: newPassword }),
+                body: JSON.stringify({ username, new_password: newPassword, confirm_password: confirmPassword }),
             });
 
             const data = await response.json();

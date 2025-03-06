@@ -49,6 +49,19 @@ function Home() {
         marginBottom: "20px",  
     };
 
+    const helpLinkContainer = {
+        position: "absolute",
+        bottom: "30px",
+        textAlign: "center",
+    };
+
+    const helpLinkStyle = {
+        fontSize: "18px",
+        color: "#F56600",
+        textDecoration: "none",
+        fontWeight: "bold",
+    };
+
     return (
         <div style={containerStyle}>
             <h1 style={{ fontSize: "60px", color: "#333333", marginBottom: "20px" }}> Welcome to the Driver Incentive Program<br />Home Page!</h1>
@@ -139,6 +152,12 @@ function Home() {
                     alt={`Slide ${currentIndex}`}
                     style={imageStyle}
                 />
+            </div>
+
+            <div style={helpLinkContainer}>
+                <Link to="/help" style={helpLinkStyle}>
+                        Need help? Visit our Help & Support Page
+                </Link>
             </div>
         </div>
     );

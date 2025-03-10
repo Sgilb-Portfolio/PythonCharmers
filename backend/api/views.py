@@ -166,7 +166,7 @@ def reset_password(request):
             return JsonResponse({"error": "User not found"}, status=404)
 
         # Update the password securely
-        user.set_password(new_password)
+        user.account_password = new_password
         user.save()
 
         return JsonResponse({"message": "Password reset successful"}, status=200)

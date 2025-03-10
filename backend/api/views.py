@@ -161,7 +161,7 @@ def reset_password(request):
             return JsonResponse({"error": "Passwords do not match"}, status=400)
 
         try:
-            user = Account.objects.get(username=username)
+            user = Account.objects.get(account_username=username)
         except Account.DoesNotExist:
             return JsonResponse({"error": "User not found"}, status=404)
 

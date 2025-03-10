@@ -125,6 +125,7 @@ def login_user(request):
 #             confirm_password = data.get("confirm_password")
 
 #             if not username or not new_password or not confirm_password:
+#                 return JsonResponse({"error": "All fields are required."}, status=400)
 
 #             if new_password != confirm_password:
 #                 return JsonResponse({"error": "Passwords do not match."}, status=400)

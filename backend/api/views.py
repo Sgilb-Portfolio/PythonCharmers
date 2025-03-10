@@ -115,34 +115,63 @@ def login_user(request):
             return JsonResponse(auth_result, status=401)
         return JsonResponse(auth_result)
 
+
+# def reset_password(request):
+#     if request.method == "POST":
+#         try:
+#             data = json.loads(request.body)  
+#             username = data.get("username")
+#             new_password = data.get("new_password")
+#             confirm_password = data.get("confirm_password")
+
+#             if not username or not new_password or not confirm_password:
+
+#             if new_password != confirm_password:
+#                 return JsonResponse({"error": "Passwords do not match."}, status=400)
+
+#             try:
+#                 user = Account.objects.get(username=username)
+#                 user.password = make_password(new_password)  # Hash the new password
+#                 user.save()
+#                 return JsonResponse({"message": "Password updated successfully!"}, status=200)
+
+#             except Account.DoesNotExist:
+#                 return JsonResponse({"error": "User not found."}, status=404)
+
+#         except json.JSONDecodeError:
+#             return JsonResponse({"error": "Invalid JSON format."}, status=400)
+
+#     return JsonResponse({"error": "Invalid request method."}, status=405)
 @csrf_exempt 
 def reset_password(request):
-    if request.method == "POST":
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        username = data.get("username", "").strip()
+        new_password = data.get("new_password", "")
+        confirm_password = data.get("confirm_password", "")
+
+        if not username or not new_password or not confirm_password:
+            return JsonResponse({"error": "All fields are required"}, status=400)
+
+        if new_password != confirm_password:
+            return JsonResponse({"error": "Passwords do not match"}, status=400)
+
         try:
-            data = json.loads(request.body)  
-            username = data.get("username")
-            new_password = data.get("new_password")
-            confirm_password = data.get("confirm_password")
+            user = Account.objects.get(username=username)
+        except Account.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
 
-            if not username or not new_password or not confirm_password:
-                return JsonResponse({"error": "All fields are required."}, status=400)
+        # Update the password securely
+        user.set_password(new_password)
+        user.save()
 
-            if new_password != confirm_password:
-                return JsonResponse({"error": "Passwords do not match."}, status=400)
+        return JsonResponse({"message": "Password reset successful"}, status=200)
 
-            try:
-                user = Account.objects.get(username=username)
-                user.password = make_password(new_password)  # Hash the new password
-                user.save()
-                return JsonResponse({"message": "Password updated successfully!"}, status=200)
-
-            except Account.DoesNotExist:
-                return JsonResponse({"error": "User not found."}, status=404)
-
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON format."}, status=400)
-
-    return JsonResponse({"error": "Invalid request method."}, status=405)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
 @csrf_exempt
 def protected_view(request):

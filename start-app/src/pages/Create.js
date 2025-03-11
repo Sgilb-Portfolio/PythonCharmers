@@ -53,7 +53,7 @@ function Create() {
     
             if (dbresponse.ok) {
                 alert(`Account created! Your ID is ${dbresult.account_id}`);
-                setTimeout(() => navigate("/Account-confirmation"), 1000); //redirect to confirmation after success
+                setTimeout(() => navigate(`/account-confirmation?username=${data.username}`), 1000); //redirect to confirmation after success
             } else {
                 alert(`Error: ${dbresult.error}`);
             }

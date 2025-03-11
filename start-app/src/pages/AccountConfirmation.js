@@ -1,11 +1,20 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function ConfirmAccount() {
     const [username, setUsername] = useState("");
     const [confirmation_code, setCode] = useState("");
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const Params = new URLSearchParams(location.search);
+        const user = Params.get("username");
+        if (user) {
+            setUsername(user);
+        }
+    }, [location]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,7 +26,6 @@ function ConfirmAccount() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, confirmation_code }),
             });
-
             const data = await response.json();
             if (response.ok) {
                 setMessage("Account confirmed successfully! Redirecting to login...");
@@ -40,7 +48,8 @@ function ConfirmAccount() {
             backgroundColor: "#ffffff"
         }}>
             <h2 style={{ fontSize: "40px", color: "#333333", marginBottom: "20px"}}>Account Confirmation</h2>
-            <div style={{ fontSize: "18px", maxWidth: "400px", textAlign: "center"}}>Please enter the code sent to your email you entered during account creation.</div>
+            <div style={{ fontSize: "18px", maxWidth: "400px", textAlign: "center"}}>
+                Please enter the code sent to your email you entered during account creation.</div>
             <br />
             <form onSubmit={handleSubmit}>
                 <input 

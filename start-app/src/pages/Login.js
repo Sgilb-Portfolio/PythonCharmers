@@ -10,7 +10,7 @@ function Login() {
     const [password, setPassword] = useState("")
     const [errorMessage, setMessage] = useState("")
     const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -65,6 +65,11 @@ function Login() {
 
     const handleRememberMeChange = (e) => {
         setRememberMe(e.target.checked);
+        if (e.target.checked) {
+            localStorage.setItem("savedUsername", username);
+        } else {
+            localStorage.removeItem("savedUsername");
+        }
     };
 
     return (
@@ -142,7 +147,7 @@ function Login() {
 
                     {errorMessage && <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>}
 
-                    <CheckBox label="Remember Me" onChange={handleRememberMeChange} />
+                    <CheckBox label="Remember Me" checked={rememberMe} onChange={handleRememberMeChange} />
 
                     <p>
                         <Link to="/reset-password" style={{ color: "#F56600", cursor: "pointer" }}>

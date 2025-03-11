@@ -7,6 +7,7 @@ import Create from "./pages/Create";
 import Applications from "./pages/Applications";
 import Help from "./pages/Help";
 import ResetPassword from "./components/ResetPassword";
+import AccountConfirmation from "./pages/AccountConfirmation";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/applications" element={<Applications />} />
       <Route path="/help" element={<Help />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/account-confirmation" element={<AccountConfirmation />} />
     </Routes>
   );
 }

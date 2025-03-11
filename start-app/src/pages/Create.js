@@ -1,8 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import { useState } from 'react';
 import ProgressBar from "../components/ProgressBar";
 
 function Create() {
@@ -12,12 +11,13 @@ function Create() {
     const handleShowPassword = () => {
         setShowPassword(!showPassword)
     }
+    const navigate = useNavigate();
     const [password, setPassword] = useState("")
     // const onSubmit = (data) => console.log(data);
     const onSubmit = async (data) => {
         try {
-            //const cognitoResponse = await fetch("http://localhost:8000/api/register-cognito/", {
-            const cognitoResponse = await fetch("http://44.202.51.190:8000/api/register-cognito/", {
+            const cognitoResponse = await fetch("http://localhost:8000/api/register-cognito/", {
+            //const cognitoResponse = await fetch("http://44.202.51.190:8000/api/register-cognito/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -53,6 +53,7 @@ function Create() {
     
             if (dbresponse.ok) {
                 alert(`Account created! Your ID is ${dbresult.account_id}`);
+                setTimeout(() => navigate("/Account-confirmation"), 1000); //redirect to confirmation after success
             } else {
                 alert(`Error: ${dbresult.error}`);
             }

@@ -49,12 +49,12 @@ def sign_in(username, password):
             return {"error": "Tokens not found in the response"}
     except ClientError as e:
         error_code = e.response['Error']['Code']
-    if error_code == "NotAuthorizedException":
-        return {"error": "Invalid username or password"}
-    elif error_code == "UserNotFoundException":
-        return {"error": "User not found"}
-    else:
-        return {"error": f"An error occurred: {e}"}
+        if error_code == "NotAuthorizedException":
+            return {"error": "Invalid username or password"}
+        elif error_code == "UserNotFoundException":
+            return {"error": "User not found"}
+        else:
+            return {"error": f"An error occurred: {e}"}
 
 
 def verify_token(id_token):

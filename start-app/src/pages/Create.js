@@ -37,7 +37,7 @@ function Create() {
             }
 
 
-            const response = await fetch("http://44.202.51.190:8000/api/create-account/", {  // Update URL if needed
+            const dbresponse = await fetch("http://44.202.51.190:8000/api/create-account/", {  // Update URL if needed
             //const dbresponse = await fetch("http://localhost:8000/api/create-account/", {
                 method: "POST",
                 headers: {

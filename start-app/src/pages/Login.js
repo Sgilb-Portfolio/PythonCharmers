@@ -32,8 +32,8 @@ function Login() {
         setMessage(""); // Clear previous messages
 
         try {
-            //const response = await fetch("http://44.202.51.190:8000/api/login-cognito/", {
-            const response = await fetch("http://localhost:8000/api/login-cognito/", {
+            const response = await fetch("http://44.202.51.190:8000/api/login-cognito/", {
+            //const response = await fetch("http://localhost:8000/api/login-cognito/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

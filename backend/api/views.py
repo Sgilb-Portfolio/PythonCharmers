@@ -1,18 +1,22 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.db import connection
+from django.db import connection, transaction
 from django.contrib.auth import authenticate
 from .models import AboutData
 from django.views.decorators.csrf import csrf_exempt   
 import jwt
 from datetime import datetime, timedelta
+from django.utils.timezone import now
 from rest_framework_simplejwt.tokens import RefreshToken 
 from django.conf import settings  # For SECRET_KEY
 from rest_framework import status  # For HTTP status codes
 from django.contrib.auth.hashers import make_password
 import json                                             
-from .models import Account
+from .models import FailedLoginAttempts, Account
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
+
+MAX_ATTEMPTS = 3
+LOCKOUT_DURATION = timedelta(minutes=1)
 
 def about(request):
     try:
@@ -59,33 +63,6 @@ def create_account(request):
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
-        
-
-@csrf_exempt 
-def login(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            username = data.get("username")
-            password = data.get("password")
-            try:
-                user = Account.objects.get(account_username=username)
-                if user.account_password == password:
-                    payload = {
-                        'id': user.account_id,
-                        'username': user.account_username,
-                        'exp': datetime.utcnow() + timedelta(days=1),
-                    }
-                    token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
-                    return JsonResponse({"token": token, "message": "Login successful!"}, status=status.HTTP_200_OK)
-                else:
-                    return JsonResponse({"error": "Invalid credentials"}, status=401)
-            except Account.DoesNotExist:
-                return JsonResponse({"error": "User not found"}, status=404)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
-
 
 """Cognito functions"""
 @csrf_exempt
@@ -110,9 +87,31 @@ def login_user(request):
     """Handles user login and returns JWT tokens"""
     if request.method == "POST":
         data = json.loads(request.body)
-        auth_result = sign_in(data["username"], data["password"])
+        username = data.get("username")
+        password = data.get("password")
+        try:
+            failed_attempt = FailedLoginAttempts.objects.get(username=username)
+        except FailedLoginAttempts.DoesNotExist:
+            failed_attempt = None
+        if failed_attempt and failed_attempt.lockout_until and failed_attempt.lockout_until > now():
+            return JsonResponse({
+                "error": "Account locked. Try again later.",
+                "lockout_until": failed_attempt.lockout_until.strftime("%Y-%m-%d %H:%M:%S")
+            }, status=403)
+            
+        auth_result = sign_in(username, password)
         if "error" in auth_result:
-            return JsonResponse(auth_result, status=401)
+            remaining_attempts = None
+            if failed_attempt:
+                remaining_attempts = MAX_ATTEMPTS - failed_attempt.failed_attempts
+            response_data = {"error": "Invalid credentials"}
+            if remaining_attempts is not None:
+                response_data["remaining_attempts"] = remaining_attempts
+            return JsonResponse(response_data, status=401)
+        if failed_attempt:
+            failed_attempt.failed_attempts = 0
+            failed_attempt.lockout_until = None
+            failed_attempt.save()
         return JsonResponse(auth_result)
 
 

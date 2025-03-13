@@ -32,8 +32,8 @@ function Login() {
         setMessage(""); // Clear previous messages
 
         try {
-            const response = await fetch("http://44.202.51.190:8000/api/login-cognito/", {
-            //const response = await fetch("http://localhost:8000/api/login-cognito/", {
+            //const response = await fetch("http://44.202.51.190:8000/api/login-cognito/", {
+            const response = await fetch("http://localhost:8000/api/login-cognito/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -56,7 +56,13 @@ function Login() {
                 setMessage("Login successful!");
                 setTimeout(() => navigate("/about"), 1000); // Redirect after success
             } else {
-                setMessage(data.error || "Invalid credentials. Please try again.");
+                if(data.lockout_until) {
+                    setMessage(`Your account is locked until ${new Date(data.lockout_until).toLocaleString()}. Please try again later.`);
+                } else if (data.remaining_attempts !== undefined) {
+                    setMessage(`Invalid credentials. ${data.remaining_attempts} attempts remaining.`);
+                } else {
+                    setMessage(data.error || "Invalid credentials. Please try again.");
+                }
             }
         } catch (error) {
             setMessage("An error occurred. Please try again later.");

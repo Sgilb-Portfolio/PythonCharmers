@@ -16,8 +16,8 @@ function Create() {
     // const onSubmit = (data) => console.log(data);
     const onSubmit = async (data) => {
         try {
-            const cognitoResponse = await fetch("http://localhost:8000/api/register-cognito/", {
-            //const cognitoResponse = await fetch("http://44.202.51.190:8000/api/register-cognito/", {
+            //const cognitoResponse = await fetch("http://localhost:8000/api/register-cognito/", {
+            const cognitoResponse = await fetch("http://44.202.51.190:8000/api/register-cognito/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -37,8 +37,8 @@ function Create() {
             }
 
 
-            //const dbresponse = await fetch("http://44.202.51.190:8000/api/create-account/", {  // Update URL if needed
-            const dbresponse = await fetch("http://localhost:8000/api/create-account/", {
+            const dbresponse = await fetch("http://44.202.51.190:8000/api/create-account/", {  // Update URL if needed
+            //const dbresponse = await fetch("http://localhost:8000/api/create-account/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

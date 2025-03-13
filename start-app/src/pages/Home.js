@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HomePage1 from "../images/HomePage1.jpg";
 import HomePage2 from "../images/HomePage2.jpg";
 import HomePage3 from "../images/HomePage3.jpg";
+import { FaUserCircle } from "react-icons/fa";
 
 
 function Home() {
     const images = [HomePage1, HomePage2, HomePage3];
 
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -18,6 +21,14 @@ function Home() {
         return () => clearInterval(interval);
     }, [images.length]);
 
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    }
+
+    const handleLogout = () => {
+        localStorage.removeItem("userToekn");
+        navigate("/login")
+    }
     const carouselStyle = {
         width: "25%",  
         height: "auto", 
@@ -64,6 +75,36 @@ function Home() {
 
     return (
         <div style={containerStyle}>
+            <div style={{ position: "absolute", top: "20px", right: "30px", cursor: "pointer" }}>
+                <FaUserCircle size={40} color="#333" onClick={toggleDropdown} />
+                {dropdownOpen && (
+                    <div style={{
+                        position: "absolute",
+                        top: "45px",
+                        right: "0",
+                        backgroundColor: "white",
+                        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+                        borderRadius: "5px",
+                        width: "150px",
+                        textAlign: "left",
+                        padding: "10px"
+                    }}>
+                        <Link to="/profile" style={{ textDecoration: "none", color: "#333", display: "block", padding: "10px" }}>
+                            Profile
+                        </Link>
+                        <hr />
+                        <button onClick={handleLogout} style={{
+                            width: "100%",
+                            background: "none",
+                            border: "none",
+                            color: "#d9534f",
+                            cursor: "pointer",
+                            padding: "10px",
+                            textAlign: "left"
+                        }}>Logout</button>
+                    </div>
+                )}
+            </div>
             <h1 style={{ fontSize: "60px", color: "#333333", marginBottom: "20px" }}> Welcome to the Driver Incentive Program<br />Home Page!</h1>
             <h2 style={{ fontSize: "20px", color: "#333333", marginBottom: "20px" }}>
                 Login or create account below

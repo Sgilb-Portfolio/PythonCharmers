@@ -14,6 +14,7 @@ from django.contrib.auth.hashers import make_password
 import json                                             
 from .models import FailedLoginAttempts, Account
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
+#from .serializers import PasswordUpdateSerializer
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)

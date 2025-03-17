@@ -1,23 +1,25 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.db import connection, transaction
+from django.db import connection
+<<<<<<< Updated upstream
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Account
+=======
 from django.contrib.auth import authenticate
 from .models import AboutData
 from django.views.decorators.csrf import csrf_exempt   
 import jwt
 from datetime import datetime, timedelta
-from django.utils.timezone import now
 from rest_framework_simplejwt.tokens import RefreshToken 
 from django.conf import settings  # For SECRET_KEY
 from rest_framework import status  # For HTTP status codes
 from django.contrib.auth.hashers import make_password
 import json                                             
-from .models import FailedLoginAttempts, Account
+from .models import Account 
+from .models import Points
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
-#from .serializers import PasswordUpdateSerializer
-
-MAX_ATTEMPTS = 3
-LOCKOUT_DURATION = timedelta(minutes=1)
+>>>>>>> Stashed changes
 
 def about(request):
     try:
@@ -28,20 +30,6 @@ def about(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
     
-
-
-def get_aboutdata(request):
-    data = AboutData.objects.first()
-    response_data = {
-        "teamNum": data.teamnum,
-        "versionNum": data.versionnum,
-        "releaseDate": data.releasedate,
-        "productName": data.productname,
-        "productDesc": data.productdesc
-    }
-    return JsonResponse(response_data)
-
-@csrf_exempt
 def create_account(request):
     if request.method == 'POST':
         try:
@@ -64,6 +52,35 @@ def create_account(request):
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
+
+<<<<<<< Updated upstream
+    return JsonResponse({'error': 'Invalid request'}, status=405)
+=======
+@csrf_exempt 
+def login(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
+            try:
+                user = Account.objects.get(account_username=username)
+                if user.account_password == password:
+                    payload = {
+                        'id': user.account_id,
+                        'username': user.account_username,
+                        'exp': datetime.utcnow() + timedelta(days=1),
+                    }
+                    token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+                    return JsonResponse({"token": token, "message": "Login successful!"}, status=status.HTTP_200_OK)
+                else:
+                    return JsonResponse({"error": "Invalid credentials"}, status=401)
+            except Account.DoesNotExist:
+                return JsonResponse({"error": "User not found"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 
 """Cognito functions"""
 @csrf_exempt
@@ -88,61 +105,11 @@ def login_user(request):
     """Handles user login and returns JWT tokens"""
     if request.method == "POST":
         data = json.loads(request.body)
-        username = data.get("username")
-        password = data.get("password")
-        try:
-            failed_attempt = FailedLoginAttempts.objects.get(username=username)
-        except FailedLoginAttempts.DoesNotExist:
-            failed_attempt = None
-        if failed_attempt and failed_attempt.lockout_until and failed_attempt.lockout_until > now():
-            return JsonResponse({
-                "error": "Account locked. Try again later.",
-                "lockout_until": failed_attempt.lockout_until.strftime("%Y-%m-%d %H:%M:%S")
-            }, status=403)
-            
-        auth_result = sign_in(username, password)
+        auth_result = sign_in(data["username"], data["password"])
         if "error" in auth_result:
-            remaining_attempts = None
-            if failed_attempt:
-                remaining_attempts = MAX_ATTEMPTS - failed_attempt.failed_attempts
-            response_data = {"error": "Invalid credentials"}
-            if remaining_attempts is not None:
-                response_data["remaining_attempts"] = remaining_attempts
-            return JsonResponse(response_data, status=401)
-        if failed_attempt:
-            failed_attempt.failed_attempts = 0
-            failed_attempt.lockout_until = None
-            failed_attempt.save()
+            return JsonResponse(auth_result, status=401)
         return JsonResponse(auth_result)
 
-
-# def reset_password(request):
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)  
-#             username = data.get("username")
-#             new_password = data.get("new_password")
-#             confirm_password = data.get("confirm_password")
-
-#             if not username or not new_password or not confirm_password:
-#                 return JsonResponse({"error": "All fields are required."}, status=400)
-
-#             if new_password != confirm_password:
-#                 return JsonResponse({"error": "Passwords do not match."}, status=400)
-
-#             try:
-#                 user = Account.objects.get(username=username)
-#                 user.password = make_password(new_password)  # Hash the new password
-#                 user.save()
-#                 return JsonResponse({"message": "Password updated successfully!"}, status=200)
-
-#             except Account.DoesNotExist:
-#                 return JsonResponse({"error": "User not found."}, status=404)
-
-#         except json.JSONDecodeError:
-#             return JsonResponse({"error": "Invalid JSON format."}, status=400)
-
-#     return JsonResponse({"error": "Invalid request method."}, status=405)
 @csrf_exempt 
 def reset_password(request):
     if request.method != "POST":
@@ -185,3 +152,31 @@ def protected_view(request):
     if "error" in user_info:
         return JsonResponse(user_info, status=401)
     return JsonResponse({"message": "Access granted!", "user": user_info})
+
+@csrf_exempt
+def get_points(request):
+    """Returns a list of all drivers with their points"""
+    if request.method == "GET":
+        drivers = Points.objects.all().values("driver_id", "driver_username", "driver_points")
+        return JsonResponse({"drivers": list(drivers)})
+
+
+@csrf_exempt
+def update_points(request):
+    """Updates the points for a specific driver"""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            points_to_add = data.get("points", 0)
+
+            driver = Points.objects.get(driver_username=username)
+            driver.driver_points += points_to_add
+            driver.save()
+
+            return JsonResponse({"message": "Points updated successfully", "new_points": driver.driver_points})
+        except Points.DoesNotExist:
+            return JsonResponse({"error": "Driver not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+>>>>>>> Stashed changes

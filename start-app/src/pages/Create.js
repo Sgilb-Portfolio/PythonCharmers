@@ -73,11 +73,11 @@ function Create() {
             minHeight: "100vh",
             backgroundColor: "#ffffff"
         }}>
-            <h1 style={{fontSize: "60px",color: "#333333", marginBottom: "20px"}}>Account Creation Page</h1>
+            <h1 style={{ fontSize: "60px", color: "#333333", marginBottom: "20px" }}>Account Creation Page</h1>
 
             <Link to="/">
                 <button style={{
-                    backgroundColor : "#F56600",
+                    backgroundColor: "#F56600",
                     color: "#FFFFFF",
                     border: "none",
                     fontSize: "20px",
@@ -87,8 +87,8 @@ function Create() {
                     transition: "background-color 0.3s ease",
 
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
-                onMouseLeave={(e) => e.target.style.backgroundColor = "#f56000"}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "#f56000"}
                 >Home</button>
             </Link>
 
@@ -102,30 +102,32 @@ function Create() {
                 width: "400px",
                 textAlign: "center"
             }}>
-            <form className="Registration" onSubmit={handleSubmit(onSubmit)}>
-                <input type="text" placeholder='Username' {...register("username", { required: true})}
-                style={{
-                    width: "95%", 
-                    padding: "10px",
-                    marginBottom: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #333333"}}>
-                </input>
-                {errors.username && <span style={{ color: "red", display: "block" }}>
-                    *username* is mandatory</span>}
-                <br />
+                <form className="Registration" onSubmit={handleSubmit(onSubmit)}>
+                    <input type="text" placeholder='Username' {...register("username", { required: true })}
+                        style={{
+                            width: "95%",
+                            padding: "10px",
+                            marginBottom: "10px",
+                            borderRadius: "5px",
+                            border: "1px solid #333333"
+                        }}>
+                    </input>
+                    {errors.username && <span style={{ color: "red", display: "block" }}>
+                        *username* is mandatory</span>}
+                    <br />
 
-                <input type="email" placeholder='Email' {...register("email", { required: true})}
-                style={{
-                    width: "95%", 
-                    padding: "10px",
-                    marginBottom: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #333333"}}>
-                </input>
-                {errors.email && <span style={{ color: "red", display: "block" }}>
-                    *email* is mandatory</span>}
-                <br />
+                    <input type="email" placeholder='Email' {...register("email", { required: true })}
+                        style={{
+                            width: "95%",
+                            padding: "10px",
+                            marginBottom: "10px",
+                            borderRadius: "5px",
+                            border: "1px solid #333333"
+                        }}>
+                    </input>
+                    {errors.email && <span style={{ color: "red", display: "block" }}>
+                        *email* is mandatory</span>}
+                    <br />
 
                 <div className="passwords" 
                     style={{
@@ -146,44 +148,46 @@ function Create() {
                             top: "20px", 
                             cursor: "pointer"}}>
                             {(showPassword) ? <AiFillEye /> : <AiFillEyeInvisible />}
-                    </span>
-                    {errors.password && <span style={{ color: "red", display: "block" }}>
-                        *password* is mandatory</span>}
-                    <div
-                    style={{
-                        width: "100%",
-                    }}>
-                    <ProgressBar password={password} />
+                        </span>
+                        {errors.password && <span style={{ color: "red", display: "block" }}>
+                            *password* is mandatory</span>}
+                        <div
+                            style={{
+                                width: "100%",
+                            }}>
+                            <ProgressBar password={password} />
+                        </div>
+                        <input type="password" placeholder='Confirm Password' {...register("confirmPassword", {
+                            required: "Please confirm",
+                            validate: value => value === passwordWatch || "passwords do not match"
+                        })}
+                            style={{
+                                width: "95%",
+                                padding: "10px",
+                                marginBottom: "10px",
+                                borderRadius: "5px",
+                                border: "1px solid #333333"
+                            }} />
+                        {errors.confirmPassword && <span style={{ color: "red", display: "block" }}>{errors.confirmPassword.message}</span>}
                     </div>
-                    <input type="password" placeholder='Confirm Password' {...register("confirmPassword", { required: "Please confirm",
-                        validate: value => value === passwordWatch || "passwords do not match"
-                     })}
-                     style={{
-                        width: "95%", 
-                        padding: "10px",
-                        marginBottom: "10px",
-                        borderRadius: "5px",
-                        border: "1px solid #333333"}}/>
-                    {errors.confirmPassword && <span style={{ color: "red", display: "block" }}>{errors.confirmPassword.message}</span>}
-                </div>
-                <br />
-                <br />
-                
-                <input type="submit" value = "Create Account"
-                style={{
-                    width: "100%",
-                    backgroundColor: "#f56600",
-                    color: "#FFFFFF",
-                    border: "none",
-                    padding: "10px",
-                    fontSize: "18px",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease"
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = "#F56600"}/>
-            </form>
+                    <br />
+                    <br />
+
+                    <input type="submit" value="Create Account"
+                        style={{
+                            width: "100%",
+                            backgroundColor: "#f56600",
+                            color: "#FFFFFF",
+                            border: "none",
+                            padding: "10px",
+                            fontSize: "18px",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            transition: "background-color 0.3s ease"
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = "#F56600"} />
+                </form>
             </div>
         </div>
     );

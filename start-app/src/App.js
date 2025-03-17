@@ -8,7 +8,8 @@ import Applications from "./pages/Applications";
 import Help from "./pages/Help";
 import ResetPassword from "./components/ResetPassword";
 import AccountConfirmation from "./pages/AccountConfirmation";
-import Points from "./pages/Points"
+import Points from "./pages/Points";
+import Profile from "./pages/Profile"
 
 function App() {
   return (

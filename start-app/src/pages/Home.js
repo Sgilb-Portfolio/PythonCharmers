@@ -30,24 +30,24 @@ function Home() {
         navigate("/login")
     }
     const carouselStyle = {
-        width: "25%",  
-        height: "auto", 
+        width: "25%",
+        height: "auto",
         position: "relative",
         overflow: "hidden",
         margin: "20px 0",
     };
 
     const imageStyle = {
-        width: "100%", 
-        height: "100%",  
+        width: "100%",
+        height: "100%",
         objectFit: "contain",
     };
 
-    
+
     const containerStyle = {
-        display: "flex",         
-        flexDirection: "column", 
-        justifyContent: "center", 
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
         alignItems: "center",
         minHeight: "100vh",
         textAlign: "center",
@@ -56,8 +56,8 @@ function Home() {
     const buttonContainerStyle = {
         display: "flex",
         justifyContent: "center",
-        gap: "20px",   
-        marginBottom: "20px",  
+        gap: "20px",
+        marginBottom: "20px",
     };
 
     const helpLinkContainer = {
@@ -184,7 +184,25 @@ function Home() {
                         Applications
                     </button>
                 </Link>
-               
+
+                <Link to="/points">
+                    <button
+                        style={{
+                            backgroundColor: "#F56600",
+                            color: "#FFFFFF",
+                            border: "none",
+                            fontSize: "1vw",
+                            borderRadius: "5px",
+                            padding: ".5vw 1.5vw",
+                            cursor: "pointer",
+                            transition: "background-color 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = "#f56000"}
+                    >
+                        Manage Points
+                    </button>
+                </Link>
             </div>
 
             <div style={carouselStyle}>
@@ -197,7 +215,7 @@ function Home() {
 
             <div style={helpLinkContainer}>
                 <Link to="/help" style={helpLinkStyle}>
-                        Need help? Visit our Help & Support Page
+                    Need help? Visit our Help & Support Page
                 </Link>
             </div>
         </div>

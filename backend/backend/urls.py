@@ -17,13 +17,6 @@ Including another URLconf
 from django.urls import path
 from api.views import about
 from api.views import create_account
-<<<<<<< Updated upstream
-
-urlpatterns = [
-    path('api/about/', about, name='about'),
-    path('api/create-account/', create_account, name='create-account')
-]
-=======
 from api.views import login
 from api.views import register_user, confirm_user, login_user, protected_view, reset_password, update_points, get_points
 
@@ -40,4 +33,3 @@ urlpatterns = [
     path("api/update-points/", update_points, name="update-points"),
     path("api/get-points/", get_points, name="get-points")
 ]
->>>>>>> Stashed changes

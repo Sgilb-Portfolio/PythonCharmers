@@ -1,11 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.db import connection
-<<<<<<< Updated upstream
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import Account
-=======
 from django.contrib.auth import authenticate
 from .models import AboutData
 from django.views.decorators.csrf import csrf_exempt   
@@ -19,7 +14,6 @@ import json
 from .models import Account 
 from .models import Points
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
->>>>>>> Stashed changes
 
 def about(request):
     try:
@@ -53,9 +47,6 @@ def create_account(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-<<<<<<< Updated upstream
-    return JsonResponse({'error': 'Invalid request'}, status=405)
-=======
 @csrf_exempt 
 def login(request):
     if request.method == "POST":
@@ -179,4 +170,3 @@ def update_points(request):
             return JsonResponse({"error": "Driver not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
->>>>>>> Stashed changes

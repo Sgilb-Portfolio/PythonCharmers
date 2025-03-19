@@ -7,7 +7,7 @@ const Points = () => {
 
     // Fetch the list of drivers
     useEffect(() => {
-        fetch("http://localhost:8000/api/get-points/")
+        fetch("http://44.202.51.190:8000/api/get-points/")
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched drivers:", data); // Debugging
@@ -33,7 +33,7 @@ const Points = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:8000/api/update-points/", {
+            const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -125,42 +125,6 @@ const Points = () => {
                         </tr>
                     )}
                 </tbody>
-                {/* <tbody>
-               
-                    {drivers.map((driver) => (
-                        <tr key={driver.username}>
-                            <td style={{ padding: "10px", border: "1px solid #ddd" }}>{driver.username}</td>
-                            <td style={{ padding: "10px", border: "1px solid #ddd" }}>{driver.points}</td>
-                            <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={pointInputs[driver.username] || ""}
-                                    onChange={(e) => handleInputChange(driver.username, e.target.value)}
-                                    style={{
-                                        width: "60px",
-                                        padding: "5px",
-                                        marginRight: "5px"
-                                    }}
-                                />
-                                <button
-                                    onClick={() => handleUpdatePoints(driver.username)}
-                                    style={{
-                                        backgroundColor: "#f56600",
-                                        color: "#fff",
-                                        border: "none",
-                                        padding: "5px 10px",
-                                        cursor: "pointer",
-                                        borderRadius: "5px"
-                                    }}
-                                >
-                                    Add
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-               
-                </tbody> */}
             </table>
         </div>
     );

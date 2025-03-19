@@ -84,7 +84,7 @@ const Points = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {Array.isArray(drivers) && drivers.length > 0 ? (
+                    {drivers.length > 0 ? (
                         drivers.map((driver) => (
                             <tr key={driver.driver_username}>
                                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>{driver.driver_username}</td>

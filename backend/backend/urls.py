@@ -22,7 +22,7 @@ from api.views import register_user, confirm_user, login_user, protected_view, r
 
 urlpatterns = [
     path('api/about/', about, name='about'),
-    path('api/aboutdata/', get_aboutdata, name='get_aboutdata'),
+    # path('api/aboutdata/', get_aboutdata, name='get_aboutdata'),
     path('api/create-account/', create_account, name='create_account'),
     path('api/login/', login, name='login'),
     path("api/register-cognito/", register_user, name="register_cognito"),

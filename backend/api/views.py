@@ -24,6 +24,20 @@ def about(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
     
+def get_aboutdata(request):
+    try:
+        data = AboutData.objects.first()
+        response_data = {
+            "teamNum": data.teamnum,
+            "versionNum": data.versionnum,
+            "releaseDate": data.releasedate,
+            "productName": data.productname,
+            "productDesc": data.productdesc
+        }
+        return JsonResponse(response_data)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    
 def create_account(request):
     if request.method == 'POST':
         try:

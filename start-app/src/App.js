@@ -1,5 +1,5 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Login from "./pages/Login";
@@ -12,6 +12,41 @@ import Points from "./pages/Points";
 import Profile from "./pages/Profile"
 
 function App() {
+  const navigate = useNavigate();
+  const INACTIVITY_LIMIT = 1 * 60 * 1000;
+  let inactivityTimer;
+
+  useEffect(() => {
+    const resetInactivityTimer = () => {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            handleLogout();
+        }, INACTIVITY_LIMIT);
+    };
+
+    const handleLogout = () => {
+        console.log("User logged out due to inactivity");
+        localStorage.removeItem("IdToken");
+        localStorage.removeItem("AccessToken");
+        localStorage.removeItem("RefreshToken");
+        localStorage.removeItem("userType");
+        navigate("/login");
+    };
+
+    window.addEventListener("mousemove", resetInactivityTimer);
+    window.addEventListener("keydown", resetInactivityTimer);
+    window.addEventListener("click", resetInactivityTimer);
+
+    resetInactivityTimer();
+
+    return () => {
+        window.removeEventListener("mousemove", resetInactivityTimer);
+        window.removeEventListener("keydown", resetInactivityTimer);
+        window.removeEventListener("click", resetInactivityTimer);
+        clearTimeout(inactivityTimer);
+    };
+}, [navigate]);
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />

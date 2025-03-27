@@ -85,6 +85,14 @@ const Header = () => {
                     transition: "color 0.2s"
                 }}>Manage Points</Link>
 
+                <Link to="/catalog" style={{
+                    margin: "0 10px",
+                    textDecoration: "none",
+                    color: "#ffffff",
+                    fontWeight: "500",
+                    transition: "color 0.2s"
+                }}>Catalog</Link>
+
                 <Link to="/help" style={{
                     margin: "0 10px",
                     textDecoration: "none",

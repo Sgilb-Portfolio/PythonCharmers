@@ -20,6 +20,7 @@ from api.views import create_account
 from api.views import login
 from api.views import get_aboutdata
 from api.views import register_user, confirm_user, login_user, protected_view, reset_password, update_points, get_points
+from api.views import itunes_search
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -32,5 +33,6 @@ urlpatterns = [
     path("api/protected-cognito/", protected_view, name="protected_cognito"),
     path("api/reset-password/", reset_password, name="reset_password"),
     path("api/update-points/", update_points, name="update-points"),
-    path("api/get-points/", get_points, name="get-points")
+    path("api/get-points/", get_points, name="get-points"),
+    path("api/itunes-search/", itunes_search, name="itunes-search")
 ]

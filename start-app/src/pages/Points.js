@@ -17,7 +17,8 @@ function Points() {
 
     const fetchDrivers = async () => {
         try {
-            const response = await fetch("http://44.202.51.190:8000/api/get-points/");
+            //const response = await fetch("http://44.202.51.190:8000/api/get-points/");
+            const response = await fetch("http://localhost:8000/api/get-points/");
             if (!response.ok) {
                 throw new Error("Failed to fetch data");
             }

@@ -9,7 +9,8 @@ import Help from "./pages/Help";
 import ResetPassword from "./components/ResetPassword";
 import AccountConfirmation from "./pages/AccountConfirmation";
 import Points from "./pages/Points";
-import Profile from "./pages/Profile"
+import Profile from "./pages/Profile";
+import Catalog from "./pages/Catalog";
 
 function App() {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ function App() {
       <Route path="/account-confirmation" element={<AccountConfirmation />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/points" element={<Points />} />
+      <Route path="/catalog" element={<Catalog />} />
     </Routes>
   );
 }

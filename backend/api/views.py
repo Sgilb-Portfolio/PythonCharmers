@@ -14,6 +14,20 @@ import json
 from .models import Account 
 from .models import Points
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
+import logging
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+
+from .models import EbayCredentials, EbayItem, EbayOrder
+from .serializers import (
+    EbayCredentialsSerializer, EbayItemSerializer, 
+    EbayOrderSerializer, EbaySearchResultSerializer
+)
+from .ebay_client import get_ebay_client, EbayClient
+
 
 def about(request):
     try:
@@ -184,3 +198,246 @@ def update_points(request):
             return JsonResponse({"error": "Driver not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
+logger = logging.getLogger(__name__)
+
+class EbayCredentialsViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing eBay API credentials
+    """
+    serializer_class = EbayCredentialsSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return EbayCredentials.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=True, methods=['post'])
+    def verify(self, request, pk=None):
+        """
+        Verify that the credentials are valid
+        """
+        credentials = self.get_object()
+        
+        try:
+            client = EbayClient(
+                client_id=credentials.client_id,
+                client_secret=credentials.client_secret,
+                refresh_token=credentials.refresh_token,
+                sandbox=credentials.sandbox
+            )
+            
+            # Try to get a token to verify credentials
+            token = client.get_access_token()
+            
+            return Response({
+                'valid': True,
+                'message': 'Credentials verified successfully'
+            })
+            
+        except Exception as e:
+            logger.error(f"eBay credential verification failed: {str(e)}")
+            return Response({
+                'valid': False,
+                'message': f'Failed to verify credentials: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+class EbayItemViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing eBay items
+    """
+    serializer_class = EbayItemSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return EbayItem.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        """
+        Search for items on eBay
+        """
+        keywords = request.query_params.get('keywords', '')
+        limit = int(request.query_params.get('limit', 10))
+        category_id = request.query_params.get('category_id', None)
+        
+        if not keywords:
+            return Response({
+                'error': 'Keywords parameter is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Get eBay client
+            try:
+                credentials = EbayCredentials.objects.get(user=request.user)
+                client = EbayClient(
+                    client_id=credentials.client_id,
+                    client_secret=credentials.client_secret,
+                    refresh_token=credentials.refresh_token,
+                    sandbox=credentials.sandbox
+                )
+            except EbayCredentials.DoesNotExist:
+                # Fall back to default client
+                client = get_ebay_client()
+            
+            # Search for items
+            result = client.search_items(
+                keywords=keywords, 
+                limit=limit,
+                category_id=category_id
+            )
+            
+            # Transform results to match our serializer
+            items = []
+            for item in result.get('itemSummaries', []):
+                items.append({
+                    'item_id': item.get('itemId'),
+                    'title': item.get('title'),
+                    'price': float(item.get('price', {}).get('value', 0)),
+                    'currency': item.get('price', {}).get('currency', 'USD'),
+                    'url': item.get('itemWebUrl'),
+                    'image_url': item.get('image', {}).get('imageUrl'),
+                    'condition': item.get('condition')
+                })
+            
+            serializer = EbaySearchResultSerializer(
+                items, 
+                many=True,
+                context={'request': request}
+            )
+            
+            return Response(serializer.data)
+            
+        except Exception as e:
+            logger.error(f"eBay search failed: {str(e)}")
+            return Response({
+                'error': f'Search failed: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=False, methods=['get'])
+    def user_items(self, request):
+        """
+        Get items listed by the authenticated user on eBay
+        """
+        limit = int(request.query_params.get('limit', 10))
+        offset = int(request.query_params.get('offset', 0))
+        
+        try:
+            # Get eBay client
+            try:
+                credentials = EbayCredentials.objects.get(user=request.user)
+                client = EbayClient(
+                    client_id=credentials.client_id,
+                    client_secret=credentials.client_secret,
+                    refresh_token=credentials.refresh_token,
+                    sandbox=credentials.sandbox
+                )
+            except EbayCredentials.DoesNotExist:
+                return Response({
+                    'error': 'eBay credentials not found'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Get user's items
+            items = client.get_user_items(limit=limit, offset=offset)
+            
+            return Response(items)
+            
+        except Exception as e:
+            logger.error(f"Failed to get user eBay items: {str(e)}")
+            return Response({
+                'error': f'Failed to get items: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=True, methods=['get'])
+    def detail(self, request, pk=None):
+        """
+        Get detailed information about an eBay item
+        """
+        item = self.get_object()
+        
+        try:
+            # Get eBay client
+            try:
+                credentials = EbayCredentials.objects.get(user=request.user)
+                client = EbayClient(
+                    client_id=credentials.client_id,
+                    client_secret=credentials.client_secret,
+                    refresh_token=credentials.refresh_token,
+                    sandbox=credentials.sandbox
+                )
+            except EbayCredentials.DoesNotExist:
+                # Fall back to default client
+                client = get_ebay_client()
+            
+            # Get item details
+            result = client.get_item(item.item_id)
+            
+            return Response(result)
+            
+        except Exception as e:
+            logger.error(f"Failed to get eBay item details: {str(e)}")
+            return Response({
+                'error': f'Failed to get item details: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EbayOrderViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing eBay orders
+    """
+    serializer_class = EbayOrderSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return EbayOrder.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=True, methods=['post'])
+    def update_tracking(self, request, pk=None):
+        """
+        Update tracking information for an order
+        """
+        order = self.get_object()
+        tracking_number = request.data.get('tracking_number')
+        
+        if not tracking_number:
+            return Response({
+                'error': 'Tracking number is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        order.tracking_number = tracking_number
+        order.save()
+        
+        # Here you would also update the tracking info on eBay
+        # through their API if needed
+        
+        serializer = self.get_serializer(order)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def update_status(self, request, pk=None):
+        """
+        Update the status of an order
+        """
+        order = self.get_object()
+        status_value = request.data.get('status')
+        
+        if not status_value or status_value not in dict(EbayOrder.STATUS_CHOICES):
+            return Response({
+                'error': 'Valid status is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        order.status = status_value
+        order.save()
+        
+        # Here you would also update the status on eBay
+        # through their API if needed
+        
+        serializer = self.get_serializer(order)
+        return Response(serializer.data)

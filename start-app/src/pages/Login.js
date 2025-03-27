@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import '../App.css';
 import CheckBox from '../components/CheckBox';
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 function Login() {
     const [username, setUsername] = useState("")
@@ -80,58 +82,36 @@ function Login() {
 
     return (
         <div style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
             minHeight: "100vh",
-            backgroundColor: "#ffffff"
+            fontFamily: "'Segoe UI', Roboto, 'Helvetica Neue', sans-serif",
+            backgroundColor: "#f9f9f9",
+            display: "flex",
+            flexDirection: "column"
         }}>
-            <h1 style={{ fontSize: "60px", color: "#333333", marginBottom: "20px" }}>Login Page</h1>
-
-            <Link to="/">
-                <button style={{
-                    backgroundColor: "#F56600",
-                    color: "#FFFFFF",
-                    border: "none",
-                    fontSize: "20px",
-                    borderRadius: "5px",
-                    padding: "10px 20px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease"
-                }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = "#f56000"}
-                >Home</button>
-            </Link>
-
-            <br />
-            <br />
-            <div style={{
-                backgroundColor: "#FFFFFF",
-                padding: "30px",
-                borderRadius: "5px",
-                boxShadow: "0px 4px 10px rgba(245, 102, 0, 1",
-                width: "400px",
-                textAlign: "center"
+            <Header />
+            
+            <main style={{ 
+                flex: "1", 
+                display: "flex", 
+                flexDirection: "column",
+                alignItems: "center", 
+                justifyContent: "center", 
+                padding: "40px 20px" 
             }}>
-                <form onSubmit={handleSubmit}>
-                    <input type="text" placeholder='Username' value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                        style={{
-                            width: "95%",
-                            padding: "10px",
-                            marginBottom: "10px",
-                            borderRadius: "5px",
-                            border: "1px solid #333333"
-                        }} />
-                    <br />
+                <h1 style={{ fontSize: "48px", color: "#333333", marginBottom: "20px" }}>Login Page</h1>
 
-                    <div className="passwords" style={{ position: "relative" }}>
-                        <input type={showPassword ? "text" : "password"} placeholder='Password'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                <div style={{
+                    backgroundColor: "#FFFFFF",
+                    padding: "30px",
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                    width: "400px",
+                    textAlign: "center",
+                    marginBottom: "30px"
+                }}>
+                    <form onSubmit={handleSubmit}>
+                        <input type="text" placeholder='Username' value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             required
                             style={{
                                 width: "95%",
@@ -140,56 +120,72 @@ function Login() {
                                 borderRadius: "5px",
                                 border: "1px solid #333333"
                             }} />
-                        <span className="password-eye" onClick={handleShowPassword}
+                        <br />
+
+                        <div className="passwords" style={{ position: "relative" }}>
+                            <input type={showPassword ? "text" : "password"} placeholder='Password'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                style={{
+                                    width: "95%",
+                                    padding: "10px",
+                                    marginBottom: "10px",
+                                    borderRadius: "5px",
+                                    border: "1px solid #333333"
+                                }} />
+                            <span className="password-eye" onClick={handleShowPassword}
+                                style={{
+                                    position: "absolute",
+                                    right: "10px",
+                                    top: "20px",
+                                    cursor: "pointer"
+                                }}>
+                                {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
+                            </span>
+                        </div>
+
+                        {errorMessage && <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>}
+
+                        <CheckBox label="Remember Me" checked={rememberMe} onChange={handleRememberMeChange} />
+
+                        <p>
+                            <Link to="/reset-password" style={{ color: "#F56600", cursor: "pointer" }}>
+                                Forgot Password?
+                            </Link>
+                        </p>
+
+
+                        <input type="submit" value="Login"
                             style={{
-                                position: "absolute",
-                                right: "10px",
-                                top: "20px",
-                                cursor: "pointer"
-                            }}>
-                            {showPassword ? <AiFillEye /> : <AiFillEyeInvisible />}
-                        </span>
-                    </div>
+                                width: "100%",
+                                backgroundColor: "#f56600",
+                                color: "#FFFFFF",
+                                border: "none",
+                                padding: "10px",
+                                fontSize: "18px",
+                                borderRadius: "5px",
+                                cursor: "pointer",
+                                transition: "background-color 0.3s ease"
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = "#F56600"} />
+                    </form>
 
-                    {errorMessage && <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>}
-
-                    <CheckBox label="Remember Me" checked={rememberMe} onChange={handleRememberMeChange} />
-
-                    <p>
-                        <Link to="/reset-password" style={{ color: "#F56600", cursor: "pointer" }}>
-                            Forgot Password?
-                        </Link>
-                    </p>
-
-
-                    <input type="submit" value="Login"
+                    <br />
+                    <p style={{
+                        color: "#333333"
+                    }
+                    }>Don't have an account? <Link to="/account-creation"
                         style={{
-                            width: "100%",
-                            backgroundColor: "#f56600",
-                            color: "#FFFFFF",
-                            border: "none",
-                            padding: "10px",
-                            fontSize: "18px",
-
-                            borderRadius: "5px",
+                            color: "#F56600",
                             cursor: "pointer",
-                            transition: "background-color 0.3s ease"
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = "#F56600"} />
-                </form>
-
-                <br />
-                <p style={{
-                    color: "#333333"
-                }
-                }>Don't have an account? <Link to="/account-creation"
-                    style={{
-                        color: "#F56600",
-                        cursor: "pointer",
-                    }}>
-                        Register</Link></p>
-            </div>
+                        }}>
+                            Register</Link></p>
+                </div>
+            </main>
+            
+            <Footer />
         </div>
     );
 }

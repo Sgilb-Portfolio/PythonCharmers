@@ -14,6 +14,7 @@ import json
 from .models import Account 
 from .models import Points
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
+import requests;
 
 def about(request):
     try:
@@ -184,3 +185,34 @@ def update_points(request):
             return JsonResponse({"error": "Driver not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
+def itunes_search(request):
+    # default search data
+    search_term = request.GET.get("term", "Taylor Swift")
+    media_type = request.GET.get("media", "music")
+    limit = int(request.GET.get('limit', 10))
+
+    itunes_url = f"https://itunes.apple.com/search?term={search_term}&media={media_type}&limit={limit}"
+
+    response = requests.get(itunes_url)
+    if response.status_code == 200:
+        data = response.json()
+        formatted_results = []
+
+        for item in data["results"]:
+            formatted_results.append({
+                "name": item.get("trackName", item.get("collectionName", "N/A")),
+                "creator": item.get("artistName", item.get("collectionArtistName", "N/A")),
+                "type": item.get("kind", media_type),
+                "image": item.get("artworkUrl100", ""),
+                "price": item.get("trackPrice", item.get("collectionPrice", "N/A")),
+                "currency": item.get("currency", ""),
+                "availability": "Available" if "trackPrice" in item or "collectionPrice" in item else "Not Available",
+                "link": item.get("trackViewUrl", item.get("collectionViewUrl", "")),
+            })
+
+        return JsonResponse({
+            "results": formatted_results,
+            "limit": limit,  # Include the limit in the response
+        }, safe=False)
+    return JsonResponse({"error": "Failed to fetch data"}, status=500)

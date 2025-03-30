@@ -11,6 +11,7 @@ import AccountConfirmation from "./pages/AccountConfirmation";
 import Points from "./pages/Points";
 import Profile from "./pages/Profile";
 import Catalog from "./pages/Catalog";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/points" element={<Points />} />
       <Route path="/catalog" element={<Catalog />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
     </Routes>
   );
 }

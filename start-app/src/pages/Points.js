@@ -59,7 +59,8 @@ function Points() {
         setUpdating(username);
 
         try {
-            const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
+            // const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
+            const response = await fetch("http://localhost:8000/api/update-points/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -105,7 +106,7 @@ function Points() {
             flexDirection: "column"
         }}>
             <Header />
-            
+
             <main style={{ flex: "1", padding: "40px 20px" }}>
                 {/* Notification */}
                 {notification.show && (
@@ -148,7 +149,7 @@ function Points() {
                         }}>
                             Driver Points Management
                         </h2>
-                        <button 
+                        <button
                             onClick={fetchDrivers}
                             style={{
                                 padding: "10px 15px",
@@ -188,7 +189,7 @@ function Points() {
                             color: "#d9534f"
                         }}>
                             <p style={{ fontSize: "16px", fontWeight: "500" }}>Error: {error}</p>
-                            <button 
+                            <button
                                 onClick={fetchDrivers}
                                 style={{
                                     marginTop: "15px",
@@ -239,8 +240,8 @@ function Points() {
                                 <tbody>
                                     {drivers.length > 0 ? (
                                         drivers.map((driver, index) => (
-                                            <tr 
-                                                key={driver.driver_id} 
+                                            <tr
+                                                key={driver.driver_id}
                                                 style={{
                                                     backgroundColor: index % 2 === 0 ? "#f9f9f9" : "white",
                                                     transition: "background-color 0.2s"
@@ -334,8 +335,8 @@ function Points() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td 
-                                                colSpan="4" 
+                                            <td
+                                                colSpan="4"
                                                 style={{
                                                     padding: "30px",
                                                     textAlign: "center",
@@ -352,7 +353,7 @@ function Points() {
                     )}
                 </div>
             </main>
-            
+
             <Footer />
         </div>
     );

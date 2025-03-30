@@ -150,7 +150,7 @@ function Login() {
                         <CheckBox label="Remember Me" checked={rememberMe} onChange={handleRememberMeChange} />
 
                         <p>
-                            <Link to="/reset-password" style={{ color: "#F56600", cursor: "pointer" }}>
+                            <Link to="/forgot-password" style={{ color: "#F56600", cursor: "pointer" }}>
                                 Forgot Password?
                             </Link>
                         </p>

@@ -1,12 +1,21 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function ResetPassword() {
     const [username, setUsername] = useState("");
+    const [verificationCode, setVerificationCode] = useState(""); // New field
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Prefill username if passed from Forgot Password page
+    React.useEffect(() => {
+        if (location.state?.username) {
+            setUsername(location.state.username);
+        }
+    }, [location.state]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,12 +27,16 @@ function ResetPassword() {
         }
 
         try {
-            const response = await fetch("http://44.202.51.190:8000/api/reset-password/", {
+            const response = await fetch("http://localhost:8000/api/reset-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, new_password: newPassword, confirm_password: confirmPassword }),
+                body: JSON.stringify({
+                    username,
+                    verification_code: verificationCode,
+                    new_password: newPassword,
+                }),
             });
 
             const data = await response.json();
@@ -43,13 +56,21 @@ function ResetPassword() {
         <div style={styles.container}>
             <div style={styles.card}>
                 <h1 style={styles.title}>Reset Password</h1>
-                <p style={styles.subtitle}>Enter your username and create a new password.</p>
+                <p style={styles.subtitle}>Enter your username, verification code, and a new password.</p>
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <input
                         type="text"
                         placeholder="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        required
+                        style={styles.input}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Verification Code"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
                         required
                         style={styles.input}
                     />
@@ -127,9 +148,6 @@ const styles = {
         borderRadius: "5px",
         cursor: "pointer",
         transition: "background-color 0.3s ease",
-    },
-    buttonHover: {
-        backgroundColor: "#522D80",
     },
     error: {
         color: "red",

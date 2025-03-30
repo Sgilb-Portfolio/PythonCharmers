@@ -79,3 +79,29 @@ def verify_token(id_token):
         return decoded_token  # If decoding is successful, return user info
     except (jwt.ExpiredSignatureError, jwt.DecodeError, StopIteration) as e:
         return {"error": str(e)}
+    
+
+def reset_password(username, new_password, verification_code):
+    """Resets password on Cognito"""
+    try:
+        response = client.confirm_forgot_password(
+            ClientId=settings.AWS_COGNITO_CLIENT_ID,
+            Username=username,
+            ConfirmationCode=verification_code,
+            Password=new_password
+        )
+        return {"success": "Password reset successfully"}
+    except ClientError as e:
+        return {"error": str(e)}
+    
+
+def forgot_password(username):
+    """Initiates a password reset for a user in AWS Cognito"""
+    try:
+        response = client.forgot_password(
+            ClientId=settings.AWS_COGNITO_CLIENT_ID,
+            Username=username
+        )
+        return {"success": "Password reset code sent"}
+    except ClientError as e:
+        return {"error": str(e)}

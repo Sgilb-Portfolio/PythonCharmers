@@ -14,8 +14,11 @@ import json
 from .models import Account 
 from .models import Points
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
+from .cognito_auth import reset_password as cognito_reset_password
+from .cognito_auth import forgot_password as cognito_forgot_password
 import requests;
 
+@csrf_exempt
 def about(request):
     try:
         with connection.cursor() as cursor:
@@ -25,6 +28,7 @@ def about(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
     
+@csrf_exempt    
 def get_aboutdata(request):
     try:
         data = AboutData.objects.first()
@@ -39,6 +43,7 @@ def get_aboutdata(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
     
+@csrf_exempt
 def create_account(request):
     if request.method == 'POST':
         try:
@@ -125,24 +130,51 @@ def reset_password(request):
         data = json.loads(request.body)
         username = data.get("username", "").strip()
         new_password = data.get("new_password", "")
-        confirm_password = data.get("confirm_password", "")
+        verification_code = data.get("verification_code", "")
 
-        if not username or not new_password or not confirm_password:
+        if not username or not new_password or not verification_code:
             return JsonResponse({"error": "All fields are required"}, status=400)
 
-        if new_password != confirm_password:
-            return JsonResponse({"error": "Passwords do not match"}, status=400)
-
+        # Check if user exists in the database
         try:
             user = Account.objects.get(account_username=username)
         except Account.DoesNotExist:
             return JsonResponse({"error": "User not found"}, status=404)
 
-        # Update the password securely
+        # Call Cognito function
+        cognito_response = cognito_reset_password(username, new_password, verification_code)
+
+        if "error" in cognito_response:
+            return JsonResponse(cognito_response, status=400)
+
+        # Update password in local database
         user.account_password = new_password
         user.save()
 
         return JsonResponse({"message": "Password reset successful"}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+    
+@csrf_exempt
+def forgot_password(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        username = data.get("username", "").strip()
+
+        if not username:
+            return JsonResponse({"error": "Username is required"}, status=400)
+
+        # Call Cognito forgot password function
+        cognito_response = cognito_forgot_password(username)
+
+        if "error" in cognito_response:
+            return JsonResponse(cognito_response, status=400)
+
+        return JsonResponse({"message": "Password reset code sent to user's email"}, status=200)
 
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON format"}, status=400)
@@ -158,6 +190,8 @@ def protected_view(request):
     if "error" in user_info:
         return JsonResponse(user_info, status=401)
     return JsonResponse({"message": "Access granted!", "user": user_info})
+
+"""cognito functions end"""
 
 @csrf_exempt
 def get_points(request):
@@ -186,6 +220,7 @@ def update_points(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
+@csrf_exempt
 def itunes_search(request):
     # default search data
     search_term = request.GET.get("term", "Taylor Swift")

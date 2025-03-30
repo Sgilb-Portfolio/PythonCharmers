@@ -1,8 +1,54 @@
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
+import myImage from '../images/trailer1.jpg';
+import { useEffect, useState } from "react";
 
 function About() {
+    const [data, setData] = useState(null);
+    const [aboutdata, setAboutData] = useState([]);
+    const [errorMessage, setErrorMessage] = useState([]);
+    const idToken = localStorage.getItem("IdToken");
+
+    useEffect(() => {
+        if (!idToken) {
+            setErrorMessage("You must be logged in to access this page.");
+            return;
+        }
+
+        //fetch("http://44.202.51.190:8000/api/about", {
+        fetch("http://localhost:8000/api/about", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${idToken}`, // Send the token here
+                "Content-Type": "application/json",
+            },
+        })
+            .then(response => response.json())
+            .then(data => setData(data))
+            .catch(error => {
+                console.error("Error:", error);
+                setErrorMessage("An error occurred while fetching data.");
+            });
+
+        //fetch("http://44.202.51.190:8000/api/aboutdata/", {
+        fetch("http://localhost:8000/api/aboutdata/", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${idToken}`, // Include token in header
+                "Content-Type": "application/json",
+            },
+        })
+            .then(response => response.json())
+            .then(data => setAboutData(data))
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                setErrorMessage("An error occurred while fetching about data.");
+            });
+    }, [idToken]);
+
+
     return (
         <div style={{
             minHeight: "100vh",
@@ -13,53 +59,123 @@ function About() {
         }}>
             <Header />
             
-            <main style={{ 
-                flex: "1", 
+            <div style={{ textAlign: "center", 
+        padding: "20px", 
+        }}>
+            <div>
+            <h1 style={{fontSize: "60px",color: "#333333"}}>About Page</h1>
+            </div>
+
+            <div style={{
+                color: "#333333", 
                 display: "flex", 
-                flexDirection: "column",
-                alignItems: "center", 
                 justifyContent: "center", 
-                padding: "40px 20px",
-                marginTop: "70px" // Add space for fixed header
-            }}>
-                <h1 style={{ fontSize: "48px", color: "#333333", marginBottom: "20px" }}>About Us</h1>
+                gap: "20px", 
+                marginBottom: "20px", 
+                flexWrap: "wrap"}}>
+            <div style={{
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    padding: "20px",
+                    boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
+                    width: "300px",
+                    textAlign: "center"
+                }}>
+                    <p style= {{fontSize: "30px"}}><strong>Team #</strong><br></br>{aboutdata.teamNum}</p>
+            </div>
+
+            <div style={{
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    padding: "20px",
+                    boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
+                    width: "300px",
+                    textAlign: "center"
+                }}>
+                    <p style={{fontSize:"30px"}}><strong>Version #</strong> <br></br>{aboutdata.versionNum}</p>
+            </div>
 
                 <div style={{
-                    backgroundColor: "#FFFFFF",
-                    padding: "30px",
+                    backgroundColor: "#fff",
                     borderRadius: "8px",
-                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                    maxWidth: "800px",
-                    textAlign: "left",
-                    marginBottom: "30px"
+                    padding: "20px",
+                    boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
+                    width: "300px",
+                    textAlign: "center"
                 }}>
-                    <h2 style={{ color: "#522D80", marginBottom: "15px" }}>Our Mission</h2>
-                    <p style={{ lineHeight: "1.6", marginBottom: "20px" }}>
-                        The Driver Incentive Program is dedicated to promoting safe driving practices and rewarding 
-                        professional drivers who demonstrate excellence on the road. Our mission is to create a 
-                        culture of safety and responsibility in the transportation industry.
-                    </p>
-                    
-                    <h2 style={{ color: "#522D80", marginBottom: "15px" }}>How It Works</h2>
-                    <p style={{ lineHeight: "1.6", marginBottom: "20px" }}>
-                        Drivers earn points for safe driving practices, completing training programs, and maintaining 
-                        accident-free records. These points can be redeemed for various rewards including gift cards, 
-                        merchandise, and special recognition.
-                    </p>
-                    
-                    <h2 style={{ color: "#522D80", marginBottom: "15px" }}>Our Team</h2>
-                    <p style={{ lineHeight: "1.6", marginBottom: "20px" }}>
-                        Our program is managed by a dedicated team of safety professionals, transportation experts, 
-                        and technology specialists who are committed to making our roads safer for everyone.
-                    </p>
-                    
-                    <h2 style={{ color: "#522D80", marginBottom: "15px" }}>Contact Us</h2>
-                    <p style={{ lineHeight: "1.6" }}>
-                        Have questions about the Driver Incentive Program? We're here to help! Contact our support 
-                        team at support@driverincentive.com or call us at (123) 456-7890.
-                    </p>
+                    <p style={{fontSize:"30px"}}><strong>Release Date</strong> <br></br>{aboutdata.releaseDate}</p>
                 </div>
-            </main>
+                <div style={{
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    padding: "20px",
+                    boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
+                    width: "1025px",
+                    textAlign: "left"
+                }}><p style={{fontSize:"20px"}}><strong>Project Name:</strong> {aboutdata.productName}</p></div>
+                <div style={{
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    padding: "20px",
+                    boxShadow: "0 4px 8px rgba(245, 102, 0, 1)",
+                    width: "1025px",
+                    textAlign: "left",
+                }}><p style={{fontSize:"20px"}}><strong>Product Description:</strong> {aboutdata.productDesc}</p></div>
+            </div>
+            <Link to="/">
+                <button style={{
+                    backgroundColor: "#F56600",
+                    color: "#FFFFFF",
+                    border: "none",
+                    fontsize: "20px",
+                    borderRadius: "5px",
+                    padding: "10px 20px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3 ease",
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#F56600"}
+                >Home</button>
+            </Link>
+
+            <div style={{ 
+                    position: "relative",  
+                width: "80%",  
+                maxWidth: "1025px",  
+                margin: "0 auto"
+                }}>
+            <img 
+                src={myImage} 
+                alt="18 Wheeler Truck"
+                style={{ 
+                width: "100%",  
+                height: "auto",
+                borderRadius: "15px", 
+                }}/>
+                <p style={{
+                position: "absolute",
+                top: "20%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                fontSize: "clamp(18px, 5vw, 60px)",
+                color: "#333333",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                textAlign: "center",
+                fontWeight: "bold",
+                whiteSpace: "normal",
+                maxWidth: "90%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+                }}>Python Charmers</p>
+            </div>
+            {data ? (
+                <p>{data.message} - Connected to: {data.database}</p>
+            ) : (
+                <p>Loading....</p>
+            )}
+        </div>
             
             <Footer />
         </div>

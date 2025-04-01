@@ -22,6 +22,7 @@ from api.views import get_aboutdata
 from api.views import register_user, confirm_user, login_user, protected_view, reset_password, update_points, get_points
 from api.views import itunes_search
 from api.views import forgot_password
+from api.views import verify_mfa
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -36,5 +37,6 @@ urlpatterns = [
     path("api/update-points/", update_points, name="update-points"),
     path("api/get-points/", get_points, name="get-points"),
     path("api/itunes-search/", itunes_search, name="itunes-search"),
-    path("api/forgot-password/", forgot_password, name="forgot-password")
+    path("api/forgot-password/", forgot_password, name="forgot-password"),
+    path("api/verify-mfa/", verify_mfa, name="verify-mfa")
 ]

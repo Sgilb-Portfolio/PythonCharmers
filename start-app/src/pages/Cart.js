@@ -80,6 +80,7 @@ function Cart() {
                                         <h3>{item.name}</h3>
                                         <p>{item.creator}</p>
                                         <p><strong>{(item.price * 100).toFixed(0)} Points</strong> each</p>
+                                        <p>Availability: {item.availability}</p>
                                         <div style={{ display: "flex", gap: "10px" }}>
                                             <button onClick={() => handleDecreaseQuantity(index)}>-</button>
                                             <span>Quantity: {item.quantity}</span>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom"; 
@@ -91,6 +91,7 @@ function Purchase() {
                                             <h3>{item.name}</h3>
                                             <p>{item.creator}</p>
                                             <p><strong>{(item.price * 100).toFixed(0)} Points</strong> each</p>
+                                            <p>Availability: {item.availability}</p>
                                             <p><strong>Quantity: {item.quantity}</strong></p>
                                         </div>
                                     </div>

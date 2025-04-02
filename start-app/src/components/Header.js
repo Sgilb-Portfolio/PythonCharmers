@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { FaUserCircle, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 
 const Header = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -9,6 +9,11 @@ const Header = () => {
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
     const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+
+    const idToken = localStorage.getItem("IdToken") || null;
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
+
 
     const handleLogout = () => {
         localStorage.removeItem("userToken");
@@ -111,6 +116,24 @@ const Header = () => {
                 flex: "1",
                 justifyContent: "flex-end"
             }}>
+                {idToken && (
+                    // If logged in, show the cart count
+                    <Link to="/cart" style={{
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        padding: "8px 15px",
+                        borderRadius: "20px",
+                        border: "1px solid #ffffff",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
+                        transition: "all 0.2s"
+                    }}>
+                        <FaShoppingCart size={20} />
+                        <span>{cartCount}</span> {/* Display the cart count */}
+                    </Link>
+                )}
                 <Link to="/login" style={{
                     textDecoration: "none",
                     color: "#ffffff",

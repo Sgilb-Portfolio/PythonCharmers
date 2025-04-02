@@ -10,6 +10,7 @@ function Catalog() {
     const [mediaType, setMediaType] = useState("movie");
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [searchHistory, setSearchHistory] = useState([]);
+    const [cart, setCart] = useState([]);
 
     const saveSearchHistory = (term) => {
         let history = JSON.parse(localStorage.getItem("searchHistory")) || [];
@@ -31,12 +32,13 @@ function Catalog() {
             .then(data => {
                 if (data.results) {
                     setItems(data.results);
+                    setError(null);
                 } else {
                     setError("No results found");
                 }
                 setLoading(false);
             })
-            .catch(error => {
+            .catch(() => {
                 setError("Failed to fetch data");
                 setLoading(false);
             });
@@ -46,8 +48,6 @@ function Catalog() {
         const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
         setSearchHistory(history);
     }, []);
-
-    
 
     const handleHistorySelect = (term) => {
         setSearchTerm(term);
@@ -64,8 +64,40 @@ function Catalog() {
         saveSearchHistory(searchTerm);
     };
 
-    //if (loading) return <p>Loading...</p>;
-    //if (error) return <p>{error}</p>;
+    const addToCart = (item) => {
+        console.log("Adding item to cart:", item);
+    
+        setCart((prevCart) => {
+            let updatedCart = [...prevCart]; // Copy current cart
+    
+            // Check if item already exists
+            const existingItem = updatedCart.find(cartItem => cartItem.name === item.name);
+    
+            if (existingItem) {
+                // Increase quantity if the item is already in the cart
+                updatedCart = updatedCart.map(cartItem =>
+                    cartItem.name === item.name
+                        ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                        : cartItem
+                );
+            } else {
+                // Add new item with quantity 1
+                updatedCart.push({ ...item, quantity: 1 });
+            }
+    
+            // Save to localStorage
+            localStorage.setItem("cart", JSON.stringify(updatedCart));
+    
+            console.log("Updated Cart:", updatedCart);
+            return updatedCart;
+        });
+    };
+    
+    // Load cart from localStorage when component mounts
+    useEffect(() => {
+        const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        setCart(savedCart);
+    }, []);
 
     return (
         <div style={{
@@ -101,7 +133,7 @@ function Catalog() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Enter a search term"
+                            placeholder="Search for products"
                             style={{
                                 padding: "10px",
                                 fontSize: "16px",
@@ -121,8 +153,7 @@ function Catalog() {
                                 border: "none",
                                 borderRadius: "4px",
                                 cursor: "pointer",
-                            }}
-                        >
+                            }}>
                             Search
                         </button>
                     </div>
@@ -200,14 +231,23 @@ function Catalog() {
                             <h3>{item.name}</h3>
                             <p>Creator: {item.creator}</p>
                             <p>Type: {item.type}</p>
-                            <p>Price: {item.price} {item.currency}</p>
+                            <p>Price: {(item.price * 100).toFixed(0)} Points</p>
                             <p>Availability: {item.availability}</p>
+                            <button onClick={() => addToCart(item)} style={{
+                                padding: "8px 12px",
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                cursor: "pointer",
+                                marginTop: "10px"
+                            }}>
+                                Add to Cart
+                            </button>
                         </div>
                     ))}
                 </div>
-                
             </main>
-            
             <Footer />
         </div>
     );

@@ -12,6 +12,8 @@ import Points from "./pages/Points";
 import Profile from "./pages/Profile";
 import Catalog from "./pages/Catalog";
 import ForgotPassword from "./pages/ForgotPassword";
+import Cart from "./pages/Cart";
+import Purchase from "./pages/Purchase";
 
 function App() {
   const navigate = useNavigate();
@@ -63,6 +65,8 @@ function App() {
       <Route path="/points" element={<Points />} />
       <Route path="/catalog" element={<Catalog />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/purchase" element={<Purchase />} />
     </Routes>
   );
 }

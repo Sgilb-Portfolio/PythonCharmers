@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.db import connection
+from django.db import connection, transaction
 from django.contrib.auth import authenticate
 from .models import AboutData
 from django.views.decorators.csrf import csrf_exempt   
@@ -10,14 +10,19 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings  # For SECRET_KEY
 from rest_framework import status  # For HTTP status codes
 from django.contrib.auth.hashers import make_password
-import json                                             
+import json     
+from django.utils.timezone import now                                        
 from .models import Account 
 from .models import Points
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
 from .cognito_auth import reset_password as cognito_reset_password
 from .cognito_auth import forgot_password as cognito_forgot_password
 from .cognito_auth import verify_mfa_code as cognito_verify_mfa
+from .models import FailedLoginAttempts
 import requests;
+
+MAX_ATTEMPTS = 3
+LOCKOUT_DURATION = timedelta(minutes=1)
 
 @csrf_exempt
 def about(request):
@@ -117,11 +122,35 @@ def login_user(request):
     """Handles user login and returns JWT tokens"""
     if request.method == "POST":
         data = json.loads(request.body)
+        username = data.get("username")
+        try:
+            failed_attempt = FailedLoginAttempts.objects.get(username=username)
+        except FailedLoginAttempts.DoesNotExist:
+            failed_attempt = None
+        if failed_attempt and failed_attempt.lockout_until and failed_attempt.lockout_until > now():
+            return JsonResponse({
+                "error": "Account locked. Try again later.",
+                "lockout_until": failed_attempt.lockout_until.strftime("%Y-%m-%d %H:%M:%S")
+            }, status=403)
         auth_result = sign_in(data["username"], data["password"])
         if "challenge" in auth_result:
+            if failed_attempt:
+                failed_attempt.failed_attempts = 0
+                failed_attempt.lockout_until = None
+                failed_attempt.save()
             return JsonResponse(auth_result, status=202)
         if "error" in auth_result:
-            return JsonResponse(auth_result, status=401)
+            remaining_attempts = None
+            if failed_attempt:
+                remaining_attempts = MAX_ATTEMPTS - failed_attempt.failed_attempts
+            response_data = {"error": "Invalid credentials"}
+            if remaining_attempts is not None:
+                response_data["remaining_attempts"] = remaining_attempts
+            return JsonResponse(response_data, status=401)
+        if failed_attempt:
+            failed_attempt.failed_attempts = 0
+            failed_attempt.lockout_until = None
+            failed_attempt.save()
         return JsonResponse(auth_result)
 
 @csrf_exempt 

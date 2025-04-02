@@ -13,6 +13,9 @@ function Login() {
     const [errorMessage, setMessage] = useState("")
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(true);
+    const [session, setSession] = useState("");
+    const [otpRequired, setOtpRequired] = useState(false);
+    const [otpCode, setOtpCode] = useState("");
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -32,9 +35,8 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage(""); // Clear previous messages
-
+    
         try {
-            //const response = await fetch("http://44.202.51.190:8000/api/login-cognito/", {
             const response = await fetch("http://localhost:8000/api/login-cognito/", {
                 method: "POST",
                 headers: {
@@ -42,23 +44,35 @@ function Login() {
                 },
                 body: JSON.stringify({ username, password }),
             });
-
+    
             const data = await response.json();
             console.log("Login Response:", data);
-
+    
             if (response.ok) {
+                // If MFA is required, show MFA form
+                if (data.challenge === "EMAIL_OTP") {
+                    setOtpRequired(true);
+                    setSession(data.session); // Store session for MFA verification
+                    localStorage.setItem("session", data.session);
+                    return;
+                }
+    
+                // If authentication is successful
                 localStorage.setItem("IdToken", data.IdToken);
                 localStorage.setItem("AccessToken", data.AccessToken);
                 localStorage.setItem("RefreshToken", data.RefreshToken);
+    
                 if (rememberMe) {
                     localStorage.setItem("savedUsername", username);
                 } else {
                     localStorage.removeItem("savedUsername");
                 }
+    
                 setMessage("Login successful!");
                 setTimeout(() => navigate("/about"), 1000); // Redirect after success
             } else {
-                if(data.lockout_until) {
+                // Handle error messages
+                if (data.lockout_until) {
                     setMessage(`Your account is locked until ${new Date(data.lockout_until).toLocaleString()}. Please try again later.`);
                 } else if (data.remaining_attempts !== undefined) {
                     setMessage(`Invalid credentials. ${data.remaining_attempts} attempts remaining.`);
@@ -70,6 +84,41 @@ function Login() {
             setMessage("An error occurred. Please try again later.");
         }
     };
+
+    useEffect(() => {
+        const savedSession = localStorage.getItem("session");
+        if (savedSession) setSession(savedSession);
+    }, []);
+
+    const handleOtpSubmit = async (e) => {
+        e.preventDefault();
+        setMessage("");
+    
+        try {
+            const response = await fetch("http://localhost:8000/api/verify-mfa/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, mfa_code: otpCode, session }),
+            });
+    
+            const data = await response.json();
+            console.log("OTP Response:", data);
+    
+            if (response.ok) {
+                localStorage.setItem("IdToken", data.IdToken);
+                localStorage.setItem("AccessToken", data.AccessToken);
+                localStorage.setItem("RefreshToken", data.RefreshToken);
+                localStorage.removeItem("session"); // Clean up session
+                setMessage("OTP verification successful!");
+                setTimeout(() => navigate("/about"), 1000);
+            } else {
+                setMessage(data.error || "OTP verification failed. Try again.");
+            }
+        } catch (error) {
+            setMessage("An error occurred. Please try again.");
+        }
+    };
+    
 
     const handleRememberMeChange = (e) => {
         setRememberMe(e.target.checked);
@@ -109,6 +158,21 @@ function Login() {
                     textAlign: "center",
                     marginBottom: "30px"
                 }}>
+                {otpRequired ? (
+                    <div>
+                        <h2>Enter Email OTP</h2>
+                        <form onSubmit={handleOtpSubmit}>
+                            <input
+                                type="text"
+                                placeholder="Enter OTP"
+                                value={otpCode}
+                                onChange={(e) => setOtpCode(e.target.value)}
+                                required
+                            />
+                            <button type="submit">Verify OTP</button>
+                        </form>
+                    </div>
+                ) : (
                     <form onSubmit={handleSubmit}>
                         <input type="text" placeholder='Username' value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -171,7 +235,7 @@ function Login() {
                             onMouseEnter={(e) => e.target.style.backgroundColor = "#522D80"}
                             onMouseLeave={(e) => e.target.style.backgroundColor = "#F56600"} />
                     </form>
-
+                )}
                     <br />
                     <p style={{
                         color: "#333333"

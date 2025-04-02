@@ -16,6 +16,7 @@ from .models import Points
 from .cognito_auth import sign_up, sign_in, verify_token, confirm_sign_up
 from .cognito_auth import reset_password as cognito_reset_password
 from .cognito_auth import forgot_password as cognito_forgot_password
+from .cognito_auth import verify_mfa_code as cognito_verify_mfa
 import requests;
 
 @csrf_exempt
@@ -117,6 +118,8 @@ def login_user(request):
     if request.method == "POST":
         data = json.loads(request.body)
         auth_result = sign_in(data["username"], data["password"])
+        if "challenge" in auth_result:
+            return JsonResponse(auth_result, status=202)
         if "error" in auth_result:
             return JsonResponse(auth_result, status=401)
         return JsonResponse(auth_result)
@@ -190,6 +193,25 @@ def protected_view(request):
     if "error" in user_info:
         return JsonResponse(user_info, status=401)
     return JsonResponse({"message": "Access granted!", "user": user_info})
+
+@csrf_exempt
+def verify_mfa(request):
+    """Handles MFA code verification and returns JWT tokens if successful"""
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    try:
+        data = json.loads(request.body)
+        username = data.get("username", "").strip()
+        mfa_code = data.get("mfa_code", "").strip()
+        session = data.get("session", "").strip()
+        if not username or not mfa_code or not session:
+            return JsonResponse({"error": "All fields are required"}, status=400)
+        auth_result = cognito_verify_mfa(username, mfa_code, session)
+        if "error" in auth_result:
+            return JsonResponse(auth_result, status=401)
+        return JsonResponse(auth_result, status=200)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
 """cognito functions end"""
 

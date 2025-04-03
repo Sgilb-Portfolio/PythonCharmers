@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f9f9f9"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="70" fill="#FFFFFF" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.1))"/>
+  <text x="30" y="43" font-family="Segoe UI, sans-serif" font-size="24" font-weight="bold" fill="#333333">Driver Incentive Program</text>
+  
+  <!-- Navigation -->
+  <text x="580" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Home</text>
+  <text x="630" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">About</text>
+  <text x="685" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Catalog</text>
+  <text x="750" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Profile</text>
+  
+  <!-- Page Title -->
+  <text x="400" y="110" font-family="Segoe UI, sans-serif" font-size="36" font-weight="bold" fill="#333333" text-anchor="middle">Store (iTunes)</text>
+  
+  <!-- Search Bar -->
+  <rect x="200" y="130" width="300" height="40" rx="5" ry="5" fill="#FFFFFF" stroke="#dddddd"/>
+  <text x="220" y="155" font-family="Segoe UI, sans-serif" font-size="14" fill="#999999">Search for products</text>
+  <rect x="510" y="130" width="90" height="40" rx="5" ry="5" fill="#4CAF50"/>
+  <text x="555" y="155" font-family="Segoe UI, sans-serif" font-size="14" fill="#FFFFFF" text-anchor="middle">Search</text>
+  
+  <!-- Media Type & Items Per Page -->
+  <rect x="200" y="180" width="120" height="30" rx="5" ry="5" fill="#FFFFFF" stroke="#dddddd"/>
+  <text x="220" y="200" font-family="Segoe UI, sans-serif" font-size="14" fill="#333333">Movie</text>
+  <rect x="330" y="180" width="80" height="30" rx="5" ry="5" fill="#FFFFFF" stroke="#dddddd"/>
+  <text x="350" y="200" font-family="Segoe UI, sans-serif" font-size="14" fill="#333333">10</text>
+  
+  <!-- Products Grid -->
+  <rect x="100" y="230" width="250" height="320" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.1))"/>
+  <rect x="120" y="250" width="210" height="140" rx="4" ry="4" fill="#eeeeee"/>
+  <text x="225" y="410" font-family="Segoe UI, sans-serif" font-size="18" font-weight="bold" fill="#333333" text-anchor="middle">Movie Title</text>
+  <text x="225" y="435" font-family="Segoe UI, sans-serif" font-size="14" fill="#666666" text-anchor="middle">Creator: Studio Name</text>
+  <text x="225" y="460" font-family="Segoe UI, sans-serif" font-size="14" fill="#666666" text-anchor="middle">Price: 250 Points</text>
+  <rect x="120" y="480" width="210" height="40" rx="5" ry="5" fill="#007bff"/>
+  <text x="225" y="505" font-family="Segoe UI, sans-serif" font-size="14" fill="#FFFFFF" text-anchor="middle">Add to Cart</text>
+  
+  <rect x="370" y="230" width="250" height="320" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.1))"/>
+  <rect x="390" y="250" width="210" height="140" rx="4" ry="4" fill="#eeeeee"/>
+  <text x="495" y="410" font-family="Segoe UI, sans-serif" font-size="18" font-weight="bold" fill="#333333" text-anchor="middle">Movie Title</text>
+  <text x="495" y="435" font-family="Segoe UI, sans-serif" font-size="14" fill="#666666" text-anchor="middle">Creator: Studio Name</text>
+  <text x="495" y="460" font-family="Segoe UI, sans-serif" font-size="14" fill="#666666" text-anchor="middle">Price: 300 Points</text>
+  <rect x="390" y="480" width="210" height="40" rx="5" ry="5" fill="#007bff"/>
+  <text x="495" y="505" font-family="Segoe UI, sans-serif" font-size="14" fill="#FFFFFF" text-anchor="middle">Add to Cart</text>
+  
+  <!-- Footer -->
+  <rect x="0" y="560" width="800" height="40" fill="#333333"/>
+  <text x="400" y="585" font-family="Segoe UI, sans-serif" font-size="14" fill="#FFFFFF" text-anchor="middle">© 2025 Driver Incentive Program | Python Charmers</text>
+</svg>

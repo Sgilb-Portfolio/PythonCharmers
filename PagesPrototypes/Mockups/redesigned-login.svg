@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f9f9f9"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="70" fill="#FFFFFF" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.1))"/>
+  <text x="30" y="43" font-family="Segoe UI, sans-serif" font-size="24" font-weight="bold" fill="#333333">Driver Incentive Program</text>
+  
+  <!-- Navigation -->
+  <text x="650" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Home</text>
+  <text x="700" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">About</text>
+  <text x="750" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Help</text>
+  
+  <!-- Page Title -->
+  <text x="400" y="130" font-family="Segoe UI, sans-serif" font-size="36" font-weight="bold" fill="#333333" text-anchor="middle">Login Page</text>
+  
+  <!-- Login Form Card -->
+  <rect x="200" y="170" width="400" height="330" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 4px 8px rgba(245,102,0,0.3))"/>
+  
+  <!-- Form Fields -->
+  <rect x="230" y="210" width="340" height="50" rx="5" ry="5" fill="#FFFFFF" stroke="#dddddd"/>
+  <text x="245" y="242" font-family="Segoe UI, sans-serif" font-size="16" fill="#999999">Username</text>
+  
+  <rect x="230" y="280" width="340" height="50" rx="5" ry="5" fill="#FFFFFF" stroke="#dddddd"/>
+  <text x="245" y="312" font-family="Segoe UI, sans-serif" font-size="16" fill="#999999">Password</text>
+  
+  <!-- Remember Me Checkbox -->
+  <rect x="230" y="350" width="16" height="16" rx="2" ry="2" fill="#FFFFFF" stroke="#F56600"/>
+  <text x="255" y="364" font-family="Segoe UI, sans-serif" font-size="14" fill="#333333">Remember Me</text>
+  
+  <!-- Forgot Password -->
+  <text x="522" y="364" font-family="Segoe UI, sans-serif" font-size="14" fill="#F56600" text-anchor="end">Forgot Password?</text>
+  
+  <!-- Login Button -->
+  <rect x="230" y="390" width="340" height="45" rx="5" ry="5" fill="#F56600"/>
+  <text x="400" y="420" font-family="Segoe UI, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Login</text>
+  
+  <!-- Register Link -->
+  <text x="400" y="460" font-family="Segoe UI, sans-serif" font-size="14" fill="#333333" text-anchor="middle">Don't have an account? <tspan fill="#F56600">Register</tspan></text>
+  
+  <!-- Footer -->
+  <rect x="0" y="560" width="800" height="40" fill="#333333"/>
+  <text x="400" y="585" font-family="Segoe UI, sans-serif" font-size="14" fill="#FFFFFF" text-anchor="middle">© 2025 Driver Incentive Program | Python Charmers</text>
+</svg>

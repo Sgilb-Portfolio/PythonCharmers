@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f9f9f9"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="70" fill="#FFFFFF" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.1))"/>
+  <text x="30" y="43" font-family="Segoe UI, sans-serif" font-size="24" font-weight="bold" fill="#333333">Driver Incentive Program</text>
+  
+  <!-- Navigation -->
+  <text x="580" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Home</text>
+  <text x="630" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">About</text>
+  <text x="685" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Catalog</text>
+  <text x="750" y="43" font-family="Segoe UI, sans-serif" font-size="16" fill="#F56600">Profile</text>
+  
+  <!-- Page Title -->
+  <text x="400" y="120" font-family="Segoe UI, sans-serif" font-size="36" font-weight="bold" fill="#333333" text-anchor="middle">About Page</text>
+  
+  <!-- Info Cards -->
+  <rect x="100" y="150" width="180" height="120" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 4px 8px rgba(245,102,0,0.3))"/>
+  <text x="190" y="200" font-family="Segoe UI, sans-serif" font-size="24" font-weight="bold" fill="#333333" text-anchor="middle">Team #</text>
+  <text x="190" y="230" font-family="Segoe UI, sans-serif" font-size="20" fill="#333333" text-anchor="middle">Python Charmers</text>
+  
+  <rect x="310" y="150" width="180" height="120" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 4px 8px rgba(245,102,0,0.3))"/>
+  <text x="400" y="200" font-family="Segoe UI, sans-serif" font-size="24" font-weight="bold" fill="#333333" text-anchor="middle">Version #</text>
+  <text x="400" y="230" font-family="Segoe UI, sans-serif" font-size="20" fill="#333333" text-anchor="middle">2.0</text>
+  
+  <rect x="520" y="150" width="180" height="120" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 4px 8px rgba(245,102,0,0.3))"/>
+  <text x="610" y="200" font-family="Segoe UI, sans-serif" font-size="24" font-weight="bold" fill="#333333" text-anchor="middle">Release Date</text>
+  <text x="610" y="230" font-family="Segoe UI, sans-serif" font-size="20" fill="#333333" text-anchor="middle">April 3, 2025</text>
+  
+  <!-- Info Cards - Project Details -->
+  <rect x="100" y="290" width="600" height="80" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 4px 8px rgba(245,102,0,0.3))"/>
+  <text x="125" y="335" font-family="Segoe UI, sans-serif" font-size="20" font-weight="bold" fill="#333333">Project Name:</text>
+  <text x="275" y="335" font-family="Segoe UI, sans-serif" font-size="20" fill="#333333">Driver Incentive Program</text>
+  
+  <rect x="100" y="390" width="600" height="100" rx="8" ry="8" fill="#FFFFFF" filter="drop-shadow(0 4px 8px rgba(245,102,0,0.3))"/>
+  <text x="125" y="430" font-family="Segoe UI, sans-serif" font-size="20" font-weight="bold" fill="#333333">Product Description:</text>
+  <text x="125" y="460" font-family="Segoe UI, sans-serif" font-size="18" fill="#333333">A rewards program for professional drivers demonstrating safe</text>
+  <text x="125" y="485" font-family="Segoe UI, sans-serif" font-size="18" fill="#333333">practices and excellence on the road.</text>
+  
+  <!-- Home Button -->
+  <rect x="350" y="510" width="100" height="40" rx="5" ry="5" fill="#F56600"/>
+  <text x="400" y="535" font-family="Segoe UI, sans-serif" font-size="16" fill="#FFFFFF" text-anchor="middle">Home</text>
+  
+  <!-- Footer -->
+  <rect x="0" y="560" width="800" height="40" fill="#333333"/>
+  <text x="400" y="585" font-family="Segoe UI, sans-serif" font-size="14" fill="#FFFFFF" text-anchor="middle">© 2025 Driver Incentive Program | Python Charmers</text>
+</svg>

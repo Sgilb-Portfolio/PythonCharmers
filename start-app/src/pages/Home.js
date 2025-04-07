@@ -10,6 +10,7 @@ import Footer from "../components/Footer";
 function Home() {
     const images = [HomePage1, HomePage2, HomePage3];
     const [currentIndex, setCurrentIndex] = useState(0);
+    const idToken = localStorage.getItem("IdToken") || null;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -74,30 +75,34 @@ function Home() {
                         gap: "20px",
                         marginBottom: "50px"
                     }}>
-                        <Link to="/login" style={{
-                            padding: "14px 30px",
-                            backgroundColor: "#F56600",
-                            color: "white",
-                            textDecoration: "none",
-                            borderRadius: "30px",
-                            fontWeight: "600",
-                            boxShadow: "0 4px 10px rgba(245, 102, 0, 0.3)",
-                            transition: "transform 0.2s, box-shadow 0.2s"
-                        }}>
-                            Login
-                        </Link>
-                        <Link to="/account-creation" style={{
-                            padding: "14px 30px",
-                            backgroundColor: "white",
-                            color: "#F56600",
-                            textDecoration: "none",
-                            borderRadius: "30px",
-                            fontWeight: "600",
-                            border: "2px solid #F56600",
-                            transition: "background-color 0.2s, color 0.2s"
-                        }}>
-                            Create Account
-                        </Link>
+                        {!idToken && (
+                            <Link to="/login" style={{
+                                padding: "14px 30px",
+                                backgroundColor: "#F56600",
+                                color: "white",
+                                textDecoration: "none",
+                                borderRadius: "30px",
+                                fontWeight: "600",
+                                boxShadow: "0 4px 10px rgba(245, 102, 0, 0.3)",
+                                transition: "transform 0.2s, box-shadow 0.2s"
+                            }}>
+                                Login
+                            </Link>
+                        )}
+                        {!idToken && (
+                            <Link to="/account-creation" style={{
+                                padding: "14px 30px",
+                                backgroundColor: "white",
+                                color: "#F56600",
+                                textDecoration: "none",
+                                borderRadius: "30px",
+                                fontWeight: "600",
+                                border: "2px solid #F56600",
+                                transition: "background-color 0.2s, color 0.2s"
+                            }}>
+                                Create Account
+                            </Link>
+                        )}
                     </div>
 
                     {/* Carousel */}

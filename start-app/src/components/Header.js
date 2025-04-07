@@ -14,6 +14,7 @@ const Header = () => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
 
+    const userRole = localStorage.getItem("userRole");
 
     const handleLogout = () => {
         localStorage.removeItem("IdToken");
@@ -82,29 +83,35 @@ const Header = () => {
                     transition: "color 0.2s"
                 }}>About</Link>
 
-                <Link to="/applications" style={{
-                    margin: "0 10px",
-                    textDecoration: "none",
-                    color: "#ffffff",
-                    fontWeight: "500",
-                    transition: "color 0.2s"
-                }}>Applications</Link>
+                {idToken && (
+                    <Link to="/applications" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Applications</Link>
+                )}
 
-                <Link to="/points" style={{
-                    margin: "0 10px",
-                    textDecoration: "none",
-                    color: "#ffffff",
-                    fontWeight: "500",
-                    transition: "color 0.2s"
-                }}>Manage Points</Link>
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/points" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Manage Points</Link>
+                )}
 
-                <Link to="/catalog" style={{
-                    margin: "0 10px",
-                    textDecoration: "none",
-                    color: "#ffffff",
-                    fontWeight: "500",
-                    transition: "color 0.2s"
-                }}>Catalog</Link>
+                {idToken && (
+                    <Link to="/catalog" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Catalog</Link>
+                )}
 
                 <Link to="/help" style={{
                     margin: "0 10px",
@@ -142,73 +149,79 @@ const Header = () => {
                         <span>{cartCount}</span> {/* Display the cart count */}
                     </Link>
                 )}
-                <Link to="/login" style={{
-                    textDecoration: "none",
-                    color: "#ffffff",
-                    fontWeight: "500",
-                    padding: "8px 15px",
-                    borderRadius: "20px",
-                    border: "1px solid #ffffff",
-                    transition: "all 0.2s"
-                }}>
-                    Login
-                </Link>
-                <Link to="/account-creation" style={{
-                    textDecoration: "none",
-                    color: "white",
-                    fontWeight: "500",
-                    padding: "8px 15px",
-                    borderRadius: "20px",
-                    backgroundColor: "#F56600",
-                    transition: "all 0.2s"
-                }}>
-                    Sign Up
-                </Link>
-                <div>
-                    <FaUserCircle
-                        size={35}
-                        color="#ffffff" // Changed to white
-                        onClick={toggleDropdown}
-                        style={{ cursor: "pointer" }}
-                    />
-                    {dropdownOpen && (
-                        <div style={{
-                            position: "absolute",
-                            top: "45px",
-                            right: 0,
-                            backgroundColor: "white",
-                            boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
-                            borderRadius: "8px",
-                            width: "180px",
-                            textAlign: "left",
-                            padding: "10px",
-                            zIndex: 101
-                        }}>
-                            <Link to="/profile" style={{
-                                display: "block",
-                                padding: "12px 15px",
-                                textDecoration: "none",
-                                color: "#333",
-                                borderRadius: "5px",
-                                transition: "background-color 0.2s",
-                                fontWeight: "500"
-                            }}>Profile</Link>
-                            <hr style={{ margin: "5px 0", border: "none", borderTop: "1px solid #eee" }} />
-                            <button onClick={handleLogout} style={{
-                                width: "100%",
-                                background: "none",
-                                border: "none",
-                                color: "#d9534f",
-                                cursor: "pointer",
-                                padding: "12px 15px",
+                {!idToken &&(
+                    <Link to="/login" style={{
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        padding: "8px 15px",
+                        borderRadius: "20px",
+                        border: "1px solid #ffffff",
+                        transition: "all 0.2s"
+                    }}>
+                        Login
+                    </Link>
+                )}
+                {!idToken &&(
+                    <Link to="/account-creation" style={{
+                        textDecoration: "none",
+                        color: "white",
+                        fontWeight: "500",
+                        padding: "8px 15px",
+                        borderRadius: "20px",
+                        backgroundColor: "#F56600",
+                        transition: "all 0.2s"
+                    }}>
+                        Sign Up
+                    </Link>
+                )}
+                {idToken && (
+                    <div>
+                        <FaUserCircle
+                            size={35}
+                            color="#ffffff" // Changed to white
+                            onClick={toggleDropdown}
+                            style={{ cursor: "pointer" }}
+                        />
+                        {dropdownOpen && (
+                            <div style={{
+                                position: "absolute",
+                                top: "45px",
+                                right: 0,
+                                backgroundColor: "white",
+                                boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
+                                borderRadius: "8px",
+                                width: "180px",
                                 textAlign: "left",
-                                borderRadius: "5px",
-                                fontWeight: "500",
-                                transition: "background-color 0.2s"
-                            }}>Logout</button>
-                        </div>
-                    )}
-                </div>
+                                padding: "10px",
+                                zIndex: 101
+                            }}>
+                                <Link to="/profile" style={{
+                                    display: "block",
+                                    padding: "12px 15px",
+                                    textDecoration: "none",
+                                    color: "#333",
+                                    borderRadius: "5px",
+                                    transition: "background-color 0.2s",
+                                    fontWeight: "500"
+                                }}>Profile</Link>
+                                <hr style={{ margin: "5px 0", border: "none", borderTop: "1px solid #eee" }} />
+                                <button onClick={handleLogout} style={{
+                                    width: "100%",
+                                    background: "none",
+                                    border: "none",
+                                    color: "#d9534f",
+                                    cursor: "pointer",
+                                    padding: "12px 15px",
+                                    textAlign: "left",
+                                    borderRadius: "5px",
+                                    fontWeight: "500",
+                                    transition: "background-color 0.2s"
+                                }}>Logout</button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Mobile Menu */}

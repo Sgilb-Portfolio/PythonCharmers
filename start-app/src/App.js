@@ -14,6 +14,8 @@ import Catalog from "./pages/Catalog";
 import ForgotPassword from "./pages/ForgotPassword";
 import Cart from "./pages/Cart";
 import Purchase from "./pages/Purchase";
+import RoleProtection from "./components/RoleProtection";
+import Protection from "./components/Protection";
 
 function App() {
   const navigate = useNavigate();
@@ -54,19 +56,19 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
+      <Route path="/about" element={<Protection><About /></Protection>} />
       <Route path="/login" element={<Login />} />
       <Route path="/account-creation" element={<Create />} />
-      <Route path="/applications" element={<Applications />} />
+      <Route path="/applications" element={<Protection><Applications /></Protection>} />
       <Route path="/help" element={<Help />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/account-confirmation" element={<AccountConfirmation />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/points" element={<Points />} />
-      <Route path="/catalog" element={<Catalog />} />
+      <Route path="/profile" element={<Protection><Profile /></Protection>} />
+      <Route path="/points" element={<RoleProtection allowedRoles={["admin","sponsor"]}><Points /></RoleProtection>} />
+      <Route path="/catalog" element={<Protection><Catalog /></Protection>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/purchase" element={<Purchase />} />
+      <Route path="/cart" element={<Protection><Cart /></Protection>} />
+      <Route path="/purchase" element={<Protection><Purchase /></Protection>} />
     </Routes>
   );
 }

@@ -16,7 +16,15 @@ const Header = () => {
 
 
     const handleLogout = () => {
-        localStorage.removeItem("userToken");
+        localStorage.removeItem("IdToken");
+        localStorage.removeItem("AccessToken");
+        localStorage.removeItem("RefreshToken");
+        localStorage.removeItem("userType");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("session");
+        localStorage.removeItem("userBio");
+        localStorage.removeItem("profilePicture");
+        localStorage.removeItem("user");
         navigate("/login");
     };
 

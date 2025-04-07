@@ -63,6 +63,7 @@ function Login() {
                 localStorage.setItem("AccessToken", data.AccessToken);
                 localStorage.setItem("RefreshToken", data.RefreshToken);
                 localStorage.setItem("userRole", data.userRole);
+                localStorage.setItem("user", username);
     
                 if (rememberMe) {
                     localStorage.setItem("savedUsername", username);
@@ -112,6 +113,7 @@ function Login() {
                 localStorage.setItem("AccessToken", data.AccessToken);
                 localStorage.setItem("RefreshToken", data.RefreshToken);
                 localStorage.removeItem("session"); // Clean up session
+                localStorage.setItem("user", username);
                 setMessage("OTP verification successful!");
                 setTimeout(() => navigate("/about"), 1000);
             } else {

@@ -19,7 +19,8 @@ from .cognito_auth import reset_password as cognito_reset_password
 from .cognito_auth import forgot_password as cognito_forgot_password
 from .cognito_auth import verify_mfa_code as cognito_verify_mfa
 from .models import FailedLoginAttempts
-import requests;
+import requests
+from .models import Prof
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -302,3 +303,64 @@ def itunes_search(request):
             "limit": limit,  # Include the limit in the response
         }, safe=False)
     return JsonResponse({"error": "Failed to fetch data"}, status=500)
+
+@csrf_exempt
+def get_profile(request, username):
+    """Fetches the user profile data based on the username"""
+    try:
+        account = Account.objects.get(account_username=username)
+        user_profile = Prof.objects.get(account_id=account.account_id)
+        response_data = {
+            "prof_fname": user_profile.prof_fname,
+            "prof_lname": user_profile.prof_lname,
+            "prof_ph_number": user_profile.prof_ph_number,
+            "prof_email": user_profile.prof_email,
+            "prof_pic_url": user_profile.prof_pic_url,
+            "prof_updated_at": user_profile.prof_updated_at,
+            "prof_bio": user_profile.prof_bio
+        }
+        return JsonResponse(response_data)
+    except Account.DoesNotExist:
+        return JsonResponse({"error": "Account not found"}, status=404)
+    except Prof.DoesNotExist:
+        return JsonResponse({"error": "User profile not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    
+@csrf_exempt
+def update_profile(request, username):
+    """Updates the user profile data based on the username"""
+    if request.method == 'PUT':
+        try:
+            account = Account.objects.get(account_username=username)
+            user_profile = Prof.objects.get(account_id=account.account_id)
+            data = json.loads(request.body)
+            first_name = data.get('first_name', None)
+            last_name = data.get('last_name', None)
+            phone_number = data.get('phone_number', None)
+            bio = data.get('bio', None)
+            if first_name:
+                user_profile.prof_fname = first_name
+            if last_name:
+                user_profile.prof_lname = last_name
+            if phone_number:
+                user_profile.prof_ph_number = phone_number
+            if bio:
+                user_profile.prof_bio = bio
+            user_profile.save()
+            response_data = {
+                "prof_fname": user_profile.prof_fname,
+                "prof_lname": user_profile.prof_lname,
+                "prof_ph_number": user_profile.prof_ph_number,
+                "prof_bio": user_profile.prof_bio,
+                "prof_updated_at": user_profile.prof_updated_at,
+            }
+            return JsonResponse(response_data)
+        except Account.DoesNotExist:
+            return JsonResponse({"error": "Account not found"}, status=404)
+        except Prof.DoesNotExist:
+            return JsonResponse({"error": "User profile not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)

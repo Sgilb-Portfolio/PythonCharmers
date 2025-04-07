@@ -7,34 +7,60 @@ function Profile() {
     const [userType, setUserType] = useState("");
     const [bio, setBio] = useState("");
     const [editBio, setEditBio] = useState(false);
+    const [newBio, setNewBio] = useState("");
     const [profilePicture, setProfilePicture] = useState(null);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [editFirstName, setEditFirstName] = useState(false);
+    const [editLastName, setEditLastName] = useState(false);
+    const [editPhoneNumber, setEditPhoneNumber] = useState(false);
+    const [newFirstName, setNewFirstName] = useState("");
+    const [newLastName, setNewLastName] = useState("");
+    const [newPhoneNumber, setNewPhoneNumber] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         const storedUserType = localStorage.getItem("userType") || "Driver";
         setUserType(storedUserType);
 
-        const storedBio = localStorage.getItem("userBio") || "No bio available.";
+        const fetchProfileData = async () => {
+            const username = localStorage.getItem("user");
+            try {
+                const response = await fetch(`http://localhost:8000/api/get-profile/${username}/`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setBio(data.prof_bio);
+                    setProfilePicture(data.prof_pic_url);
+                    setFirstName(data.prof_fname);
+                    setLastName(data.prof_lname);
+                    setPhoneNumber(data.prof_ph_number);
+                } else {
+                    setError("Failed to fetch profile data.");
+                }
+            } catch (err) {
+                setError("An error occurred while fetching profile data.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfileData();
+
+        /*const storedBio = localStorage.getItem("userBio") || "No bio available.";
         setBio(storedBio);
 
         const storedProfilePicture = localStorage.getItem("profilePicture");
         if (storedProfilePicture) {
             setProfilePicture(storedProfilePicture);
-        }
+        }*/
     }, []);
 
-    const handleLogout = () => {
-        localStorage.removeItem("IdToken");
-        localStorage.removeItem("AccessToken");
-        localStorage.removeItem("RefreshToken");
-        localStorage.removeItem("userType");
-        localStorage.removeItem("userBio");
-        localStorage.removeItem("profilePicture");
-        navigate("/login");
-    };
 
     const handleSaveBio = () => {
-        localStorage.setItem("userBio", bio);
+        setBio(newBio === "" ? null : newBio);
         setEditBio(false);
     };
 
@@ -53,6 +79,49 @@ function Profile() {
     const handleFileInputClick = () => {
         document.getElementById("fileInput").click();
     };
+
+    const handleSaveProfile = async () => {
+        const username = localStorage.getItem("user");
+        const updatedData = {
+            first_name: newFirstName || firstName,
+            last_name: newLastName || lastName,
+            phone_number: newPhoneNumber || phoneNumber,
+            bio: newBio === "" ? null : newBio || bio
+        };
+    
+        try {
+            const response = await fetch(`http://localhost:8000/api/update-profile/${username}/`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedData),
+            });
+    
+            if (response.ok) {
+                setFirstName(newFirstName || firstName);
+                setLastName(newLastName || lastName);
+                setPhoneNumber(newPhoneNumber || phoneNumber);
+                setBio(newBio || bio);
+                setEditFirstName(false);
+                setEditLastName(false);
+                setEditPhoneNumber(false);
+                setEditBio(false);
+            } else {
+                setError("Failed to save profile data.");
+            }
+        } catch (err) {
+            setError("An error occurred while saving profile data.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <div style={{
@@ -114,12 +183,67 @@ function Profile() {
                         Change Profile Picture
                     </button>
                     
+                    <h2>Profile Information</h2>
+                {/* First Name */}
+                {editFirstName ? (
+                    <div>
+                        <input
+                            type="text"
+                            value={newFirstName}
+                            onChange={(e) => setNewFirstName(e.target.value)}
+                            placeholder="First Name"
+                        />
+                        <button onClick={handleSaveProfile}>Save</button>
+                    </div>
+                ) : (
+                    <p>
+                        <strong>First Name:</strong> {firstName}
+                        <button onClick={() => setEditFirstName(true)}>Edit</button>
+                    </p>
+                )}
+
+                {/* Last Name */}
+                {editLastName ? (
+                    <div>
+                        <input
+                            type="text"
+                            value={newLastName}
+                            onChange={(e) => setNewLastName(e.target.value)}
+                            placeholder="Last Name"
+                        />
+                        <button onClick={handleSaveProfile}>Save</button>
+                    </div>
+                ) : (
+                    <p>
+                        <strong>Last Name:</strong> {lastName}
+                        <button onClick={() => setEditLastName(true)}>Edit</button>
+                    </p>
+                )}
+
+                {/* Phone Number */}
+                {editPhoneNumber ? (
+                    <div>
+                        <input
+                            type="text"
+                            value={newPhoneNumber}
+                            onChange={(e) => setNewPhoneNumber(e.target.value)}
+                            placeholder="Phone Number"
+                        />
+                        <button onClick={handleSaveProfile}>Save</button>
+                    </div>
+                ) : (
+                    <p>
+                        <strong>Phone Number:</strong> {phoneNumber}
+                        <button onClick={() => setEditPhoneNumber(true)}>Edit</button>
+                    </p>
+                )}
+
                     <h2>Bio</h2>
                     {editBio ? (
                         <div>
                             <textarea 
-                                value={bio} 
-                                onChange={(e) => setBio(e.target.value)} 
+                                value={newBio} 
+                                onChange={(e) => setNewBio(e.target.value)} 
                                 rows="4"
                                 style={{
                                     width: "100%",
@@ -129,7 +253,7 @@ function Profile() {
                                     resize: "none"
                                 }}
                             />
-                            <button onClick={handleSaveBio} style={{
+                            <button onClick={handleSaveProfile} style={{
                                 marginTop: "10px",
                                 backgroundColor: "#F56600",
                                 color: "#fff",

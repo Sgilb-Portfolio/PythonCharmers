@@ -5,3 +5,4 @@ from .account import Account
 from .points import Points
 from .pointslog import PointsLog
 from .failedloginattempts import FailedLoginAttempts
+from .prof import Prof

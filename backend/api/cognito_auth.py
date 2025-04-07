@@ -62,7 +62,14 @@ def sign_in(username, password, otp=None):
                         "message": "Please enter the OTP sent to your email."
                     }
         if "AuthenticationResult" in response:
-            return response["AuthenticationResult"]
+            auth_result = response["AuthenticationResult"]
+            id_token = auth_result["IdToken"]
+            decoded_token = verify_token(id_token)
+            role = decoded_token.get("cognito:groups", [None])[0]
+            return {
+                **auth_result,
+                "userRole": role
+            }
         else:
             return {"error": "Unexpected response from Cognito"}
     except ClientError as e:

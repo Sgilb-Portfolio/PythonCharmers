@@ -62,6 +62,7 @@ function Login() {
                 localStorage.setItem("IdToken", data.IdToken);
                 localStorage.setItem("AccessToken", data.AccessToken);
                 localStorage.setItem("RefreshToken", data.RefreshToken);
+                localStorage.setItem("userRole", data.userRole);
     
                 if (rememberMe) {
                     localStorage.setItem("savedUsername", username);

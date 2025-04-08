@@ -17,8 +17,10 @@ function Points() {
     const [loadingAudits, setLoadingAudits] = useState(false);
 
     // API Gateway URL for the audit logging Lambda
-    const AUDIT_API_URL = "https://wvzq83k32m.execute-api.us-east-1.amazonaws.com/prod/audit-logs";
-    useEffect(() => {
+    const API_BASE_URL = "https://8pk70542fj.execute-api.us-east-1.amazonaws.com/prod";
+    const AUDIT_API_URL = `${API_BASE_URL}/audit-logs`;
+    const GET_AUDIT_LOGS_URL = `${API_BASE_URL}/get-audit-logs`;
+        useEffect(() => {
         fetchDrivers();
     }, []);
 
@@ -96,7 +98,7 @@ function Points() {
         
         try {
             // This would be a separate API endpoint to retrieve logs from CloudWatch
-            const response = await fetch(`https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/get-audit-logs?driver=${username}`);
+            const response = await fetch(`${GET_AUDIT_LOGS_URL}?driver=${username}`);
             
             if (!response.ok) {
                 throw new Error("Failed to fetch audit logs");

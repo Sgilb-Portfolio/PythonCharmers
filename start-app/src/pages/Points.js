@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaMinus, FaSpinner } from "react-icons/fa";
+import { FaPlus, FaMinus, FaSpinner, FaHistory } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -10,15 +10,22 @@ function Points() {
     const [pointInputs, setPointInputs] = useState({});
     const [notification, setNotification] = useState({ show: false, message: "", type: "" });
     const [updating, setUpdating] = useState(null);
+    // New state for audit logs
+    const [auditLogs, setAuditLogs] = useState([]);
+    const [showAuditModal, setShowAuditModal] = useState(false);
+    const [selectedDriver, setSelectedDriver] = useState(null);
+    const [loadingAudits, setLoadingAudits] = useState(false);
 
+    // API Gateway URL for the audit logging Lambda
+    const AUDIT_API_URL = "https://wvzq83k32m.execute-api.us-east-1.amazonaws.com/prod/audit-logs";
     useEffect(() => {
         fetchDrivers();
     }, []);
 
     const fetchDrivers = async () => {
         try {
-            const response = await fetch("http://44.202.51.190:8000/api/get-points/");
-            //const response = await fetch("http://localhost:8000/api/get-points/");
+            // const response = await fetch("http://44.202.51.190:8000/api/get-points/");
+            const response = await fetch("http://localhost:8000/api/get-points/");
             if (!response.ok) {
                 throw new Error("Failed to fetch data");
             }
@@ -47,6 +54,64 @@ function Points() {
         }, 3000);
     };
 
+    // Log audit event to AWS Lambda via API Gateway
+    async function logAuditEvent(eventData) {
+        try {
+            // Get the reason for this point change
+            const reason = document.getElementById(`reason-${eventData.username}`)?.value || "No reason provided";
+            
+            const response = await fetch(AUDIT_API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    driver_username: eventData.username,
+                    admin_user: "admin", // Replace with actual admin user from your auth system
+                    previous_points: eventData.previousPoints,
+                    points_change: eventData.pointsChange,
+                    new_points: eventData.newPoints,
+                    reason: reason,
+                    event_type: "POINTS_UPDATE"
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error("Failed to log audit event");
+            }
+            
+            console.log("Audit log created successfully");
+            return true;
+        } catch (error) {
+            console.error("Error logging audit event:", error);
+            return false;
+        }
+    }
+    
+    // Fetch audit logs for a specific driver
+    const fetchAuditLogs = async (username) => {
+        setLoadingAudits(true);
+        setSelectedDriver(username);
+        setShowAuditModal(true);
+        
+        try {
+            // This would be a separate API endpoint to retrieve logs from CloudWatch
+            const response = await fetch(`https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/get-audit-logs?driver=${username}`);
+            
+            if (!response.ok) {
+                throw new Error("Failed to fetch audit logs");
+            }
+            
+            const data = await response.json();
+            setAuditLogs(data.logs || []);
+        } catch (error) {
+            showNotification(`Error fetching audit logs: ${error.message}`, "error");
+            setAuditLogs([]);
+        } finally {
+            setLoadingAudits(false);
+        }
+    };
+      
     // Handle updating points (add or subtract)
     const handleUpdatePoints = async (username) => {
         const pointsToChange = parseInt(pointInputs[username], 10);
@@ -59,8 +124,12 @@ function Points() {
         setUpdating(username);
 
         try {
-             const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
-             //const response = await fetch("http://localhost:8000/api/update-points/", {
+            // Get current driver info for audit log
+            const currentDriver = drivers.find(d => d.driver_username === username);
+            const previousPoints = currentDriver ? currentDriver.driver_points : 0;
+            
+            // const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
+            const response = await fetch("http://localhost:8000/api/update-points/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -73,6 +142,14 @@ function Points() {
             if (!response.ok) {
                 throw new Error(data.error || "Failed to update points.");
             }
+
+            // Log the audit event after successful point update
+            await logAuditEvent({
+                username,
+                previousPoints,
+                pointsChange: pointsToChange,
+                newPoints: data.new_points
+            });
 
             // Optimistic UI update
             setDrivers((prevDrivers) =>
@@ -97,6 +174,177 @@ function Points() {
         }
     };
 
+    // Audit Log Modal Component
+    const AuditLogModal = () => {
+        if (!showAuditModal) return null;
+        
+        return (
+            <div style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 1000
+            }}>
+                <div style={{
+                    backgroundColor: "white",
+                    borderRadius: "12px",
+                    width: "90%",
+                    maxWidth: "800px",
+                    maxHeight: "80vh",
+                    overflow: "auto",
+                    padding: "20px",
+                    boxShadow: "0 5px 20px rgba(0,0,0,0.2)"
+                }}>
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "20px"
+                    }}>
+                        <h3 style={{
+                            margin: 0,
+                            fontSize: "22px",
+                            fontWeight: "600"
+                        }}>
+                            Point Audit History: {selectedDriver}
+                        </h3>
+                        <button 
+                            onClick={() => setShowAuditModal(false)}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                fontSize: "20px",
+                                cursor: "pointer"
+                            }}
+                        >
+                            ×
+                        </button>
+                    </div>
+                    
+                    {loadingAudits ? (
+                        <div style={{
+                            textAlign: "center",
+                            padding: "30px"
+                        }}>
+                            <FaSpinner style={{
+                                fontSize: "30px",
+                                animation: "spin 1s linear infinite",
+                                color: "#F56600"
+                            }} />
+                            <p>Loading audit logs...</p>
+                        </div>
+                    ) : auditLogs.length > 0 ? (
+                        <table style={{
+                            width: "100%",
+                            borderCollapse: "collapse"
+                        }}>
+                            <thead>
+                                <tr style={{
+                                    backgroundColor: "#f0f0f0"
+                                }}>
+                                    <th style={{
+                                        padding: "12px",
+                                        textAlign: "left",
+                                        borderBottom: "1px solid #ddd"
+                                    }}>Timestamp</th>
+                                    <th style={{
+                                        padding: "12px",
+                                        textAlign: "left",
+                                        borderBottom: "1px solid #ddd"
+                                    }}>Admin</th>
+                                    <th style={{
+                                        padding: "12px",
+                                        textAlign: "center",
+                                        borderBottom: "1px solid #ddd"
+                                    }}>Previous</th>
+                                    <th style={{
+                                        padding: "12px",
+                                        textAlign: "center",
+                                        borderBottom: "1px solid #ddd"
+                                    }}>Change</th>
+                                    <th style={{
+                                        padding: "12px",
+                                        textAlign: "center",
+                                        borderBottom: "1px solid #ddd"
+                                    }}>New Value</th>
+                                    <th style={{
+                                        padding: "12px",
+                                        textAlign: "left",
+                                        borderBottom: "1px solid #ddd"
+                                    }}>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {auditLogs.map((log, index) => (
+                                    <tr key={log.request_id || index} style={{
+                                        backgroundColor: index % 2 === 0 ? "#f9f9f9" : "white"
+                                    }}>
+                                        <td style={{
+                                            padding: "12px",
+                                            borderBottom: "1px solid #eee"
+                                        }}>
+                                            {new Date(log.timestamp).toLocaleString()}
+                                        </td>
+                                        <td style={{
+                                            padding: "12px",
+                                            borderBottom: "1px solid #eee"
+                                        }}>
+                                            {log.admin_user}
+                                        </td>
+                                        <td style={{
+                                            padding: "12px",
+                                            borderBottom: "1px solid #eee",
+                                            textAlign: "center"
+                                        }}>
+                                            {log.previous_points}
+                                        </td>
+                                        <td style={{
+                                            padding: "12px",
+                                            borderBottom: "1px solid #eee",
+                                            textAlign: "center",
+                                            color: log.points_change > 0 ? "green" : "red",
+                                            fontWeight: "500"
+                                        }}>
+                                            {log.points_change > 0 ? `+${log.points_change}` : log.points_change}
+                                        </td>
+                                        <td style={{
+                                            padding: "12px",
+                                            borderBottom: "1px solid #eee",
+                                            textAlign: "center",
+                                            fontWeight: "600"
+                                        }}>
+                                            {log.new_points}
+                                        </td>
+                                        <td style={{
+                                            padding: "12px",
+                                            borderBottom: "1px solid #eee"
+                                        }}>
+                                            {log.reason || "No reason provided"}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <div style={{
+                            textAlign: "center",
+                            padding: "30px",
+                            color: "#666"
+                        }}>
+                            <p>No audit logs found for this driver.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div style={{
             minHeight: "100vh",
@@ -108,6 +356,9 @@ function Points() {
             <Header />
 
             <main style={{ flex: "1", padding: "40px 20px" }}>
+                {/* Audit Log Modal */}
+                <AuditLogModal />
+                
                 {/* Notification */}
                 {notification.show && (
                     <div style={{
@@ -235,6 +486,12 @@ function Points() {
                                             textAlign: "center",
                                             fontWeight: "600"
                                         }}>Modify Points</th>
+                                        <th style={{
+                                            padding: "15px",
+                                            textAlign: "center",
+                                            fontWeight: "600",
+                                            width: "80px"
+                                        }}>History</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -271,72 +528,112 @@ function Points() {
                                                 </td>
                                                 <td style={{
                                                     padding: "15px",
-                                                    borderBottom: "1px solid #eee",
-                                                    textAlign: "center"
+                                                    borderBottom: "1px solid #eee"
                                                 }}>
                                                     <div style={{
                                                         display: "flex",
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
+                                                        flexDirection: "column",
                                                         gap: "10px"
                                                     }}>
                                                         <div style={{
-                                                            position: "relative",
                                                             display: "flex",
-                                                            alignItems: "center"
+                                                            alignItems: "center",
+                                                            gap: "10px"
                                                         }}>
-                                                            <input
-                                                                type="number"
-                                                                value={pointInputs[driver.driver_username] || ""}
-                                                                onChange={(e) => handleInputChange(driver.driver_username, e.target.value)}
-                                                                placeholder="+/- Points"
-                                                                style={{
-                                                                    width: "100px",
-                                                                    padding: "10px 12px",
-                                                                    border: "1px solid #ddd",
-                                                                    borderRadius: "6px",
-                                                                    fontSize: "14px",
-                                                                    textAlign: "center"
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            onClick={() => handleUpdatePoints(driver.driver_username)}
-                                                            disabled={updating === driver.driver_username}
-                                                            style={{
-                                                                padding: "10px 16px",
-                                                                backgroundColor: "#F56600",
-                                                                color: "white",
-                                                                border: "none",
-                                                                borderRadius: "6px",
-                                                                cursor: updating === driver.driver_username ? "wait" : "pointer",
-                                                                fontWeight: "500",
+                                                            <div style={{
+                                                                position: "relative",
                                                                 display: "flex",
-                                                                alignItems: "center",
-                                                                gap: "8px",
-                                                                opacity: updating === driver.driver_username ? 0.7 : 1,
-                                                                transition: "background-color 0.2s, opacity 0.2s"
+                                                                alignItems: "center"
+                                                            }}>
+                                                                <input
+                                                                    type="number"
+                                                                    value={pointInputs[driver.driver_username] || ""}
+                                                                    onChange={(e) => handleInputChange(driver.driver_username, e.target.value)}
+                                                                    placeholder="+/- Points"
+                                                                    style={{
+                                                                        width: "100px",
+                                                                        padding: "10px 12px",
+                                                                        border: "1px solid #ddd",
+                                                                        borderRadius: "6px",
+                                                                        fontSize: "14px",
+                                                                        textAlign: "center"
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleUpdatePoints(driver.driver_username)}
+                                                                disabled={updating === driver.driver_username}
+                                                                style={{
+                                                                    padding: "10px 16px",
+                                                                    backgroundColor: "#F56600",
+                                                                    color: "white",
+                                                                    border: "none",
+                                                                    borderRadius: "6px",
+                                                                    cursor: updating === driver.driver_username ? "wait" : "pointer",
+                                                                    fontWeight: "500",
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                    gap: "8px",
+                                                                    opacity: updating === driver.driver_username ? 0.7 : 1,
+                                                                    transition: "background-color 0.2s, opacity 0.2s"
+                                                                }}
+                                                            >
+                                                                {updating === driver.driver_username ? (
+                                                                    <>
+                                                                        <FaSpinner style={{
+                                                                            animation: "spin 1s linear infinite"
+                                                                        }} />
+                                                                        Updating...
+                                                                    </>
+                                                                ) : (
+                                                                    <>Update</>
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                        {/* Reason input for audit logging */}
+                                                        <input
+                                                            id={`reason-${driver.driver_username}`}
+                                                            type="text"
+                                                            placeholder="Reason for change (optional)"
+                                                            style={{
+                                                                width: "100%",
+                                                                padding: "8px 12px",
+                                                                border: "1px solid #ddd",
+                                                                borderRadius: "6px",
+                                                                fontSize: "14px"
                                                             }}
-                                                        >
-                                                            {updating === driver.driver_username ? (
-                                                                <>
-                                                                    <FaSpinner style={{
-                                                                        animation: "spin 1s linear infinite"
-                                                                    }} />
-                                                                    Updating...
-                                                                </>
-                                                            ) : (
-                                                                <>Update</>
-                                                            )}
-                                                        </button>
+                                                        />
                                                     </div>
+                                                </td>
+                                                <td style={{
+                                                    padding: "15px",
+                                                    borderBottom: "1px solid #eee",
+                                                    textAlign: "center"
+                                                }}>
+                                                    <button
+                                                        onClick={() => fetchAuditLogs(driver.driver_username)}
+                                                        style={{
+                                                            padding: "8px",
+                                                            backgroundColor: "#f0f0f0",
+                                                            color: "#333",
+                                                            border: "none",
+                                                            borderRadius: "6px",
+                                                            cursor: "pointer",
+                                                            display: "inline-flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center"
+                                                        }}
+                                                        title="View Audit History"
+                                                    >
+                                                        <FaHistory size={16} />
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
                                             <td
-                                                colSpan="4"
+                                                colSpan="5"
                                                 style={{
                                                     padding: "30px",
                                                     textAlign: "center",
@@ -355,6 +652,18 @@ function Points() {
             </main>
 
             <Footer />
+
+            {/* Add necessary CSS animations */}
+            <style jsx>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                @keyframes slideIn {
+                    0% { transform: translateX(100%); opacity: 0; }
+                    100% { transform: translateX(0); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 }

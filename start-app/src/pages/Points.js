@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaMinus, FaSpinner, FaHistory } from "react-icons/fa";
+import { FaPlus, FaMinus, FaSpinner } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -10,17 +10,12 @@ function Points() {
     const [pointInputs, setPointInputs] = useState({});
     const [notification, setNotification] = useState({ show: false, message: "", type: "" });
     const [updating, setUpdating] = useState(null);
-    // New state for audit logs
-    const [auditLogs, setAuditLogs] = useState([]);
-    const [showAuditModal, setShowAuditModal] = useState(false);
-    const [selectedDriver, setSelectedDriver] = useState(null);
-    const [loadingAudits, setLoadingAudits] = useState(false);
 
     // API Gateway URL for the audit logging Lambda
     const API_BASE_URL = "https://8pk70542fj.execute-api.us-east-1.amazonaws.com/prod";
     const AUDIT_API_URL = `${API_BASE_URL}/audit-logs`;
-    const GET_AUDIT_LOGS_URL = `${API_BASE_URL}/cloudwatch-logs`;
-        useEffect(() => {
+    
+    useEffect(() => {
         fetchDrivers();
     }, []);
 
@@ -90,30 +85,6 @@ function Points() {
         }
     }
     
-    // Fetch audit logs for a specific driver
-    const fetchAuditLogs = async (username) => {
-        setLoadingAudits(true);
-        setSelectedDriver(username);
-        setShowAuditModal(true);
-        
-        try {
-            // This would be a separate API endpoint to retrieve logs from CloudWatch
-            const response = await fetch(`${GET_AUDIT_LOGS_URL}?driver=${username}`);
-            
-            if (!response.ok) {
-                throw new Error("Failed to fetch audit logs");
-            }
-            
-            const data = await response.json();
-            setAuditLogs(data.logs || []);
-        } catch (error) {
-            showNotification(`Error fetching audit logs: ${error.message}`, "error");
-            setAuditLogs([]);
-        } finally {
-            setLoadingAudits(false);
-        }
-    };
-      
     // Handle updating points (add or subtract)
     const handleUpdatePoints = async (username) => {
         const pointsToChange = parseInt(pointInputs[username], 10);
@@ -176,177 +147,6 @@ function Points() {
         }
     };
 
-    // Audit Log Modal Component
-    const AuditLogModal = () => {
-        if (!showAuditModal) return null;
-        
-        return (
-            <div style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 1000
-            }}>
-                <div style={{
-                    backgroundColor: "white",
-                    borderRadius: "12px",
-                    width: "90%",
-                    maxWidth: "800px",
-                    maxHeight: "80vh",
-                    overflow: "auto",
-                    padding: "20px",
-                    boxShadow: "0 5px 20px rgba(0,0,0,0.2)"
-                }}>
-                    <div style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "20px"
-                    }}>
-                        <h3 style={{
-                            margin: 0,
-                            fontSize: "22px",
-                            fontWeight: "600"
-                        }}>
-                            Point Audit History: {selectedDriver}
-                        </h3>
-                        <button 
-                            onClick={() => setShowAuditModal(false)}
-                            style={{
-                                background: "none",
-                                border: "none",
-                                fontSize: "20px",
-                                cursor: "pointer"
-                            }}
-                        >
-                            ×
-                        </button>
-                    </div>
-                    
-                    {loadingAudits ? (
-                        <div style={{
-                            textAlign: "center",
-                            padding: "30px"
-                        }}>
-                            <FaSpinner style={{
-                                fontSize: "30px",
-                                animation: "spin 1s linear infinite",
-                                color: "#F56600"
-                            }} />
-                            <p>Loading audit logs...</p>
-                        </div>
-                    ) : auditLogs.length > 0 ? (
-                        <table style={{
-                            width: "100%",
-                            borderCollapse: "collapse"
-                        }}>
-                            <thead>
-                                <tr style={{
-                                    backgroundColor: "#f0f0f0"
-                                }}>
-                                    <th style={{
-                                        padding: "12px",
-                                        textAlign: "left",
-                                        borderBottom: "1px solid #ddd"
-                                    }}>Timestamp</th>
-                                    <th style={{
-                                        padding: "12px",
-                                        textAlign: "left",
-                                        borderBottom: "1px solid #ddd"
-                                    }}>Admin</th>
-                                    <th style={{
-                                        padding: "12px",
-                                        textAlign: "center",
-                                        borderBottom: "1px solid #ddd"
-                                    }}>Previous</th>
-                                    <th style={{
-                                        padding: "12px",
-                                        textAlign: "center",
-                                        borderBottom: "1px solid #ddd"
-                                    }}>Change</th>
-                                    <th style={{
-                                        padding: "12px",
-                                        textAlign: "center",
-                                        borderBottom: "1px solid #ddd"
-                                    }}>New Value</th>
-                                    <th style={{
-                                        padding: "12px",
-                                        textAlign: "left",
-                                        borderBottom: "1px solid #ddd"
-                                    }}>Reason</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {auditLogs.map((log, index) => (
-                                    <tr key={log.request_id || index} style={{
-                                        backgroundColor: index % 2 === 0 ? "#f9f9f9" : "white"
-                                    }}>
-                                        <td style={{
-                                            padding: "12px",
-                                            borderBottom: "1px solid #eee"
-                                        }}>
-                                            {new Date(log.timestamp).toLocaleString()}
-                                        </td>
-                                        <td style={{
-                                            padding: "12px",
-                                            borderBottom: "1px solid #eee"
-                                        }}>
-                                            {log.admin_user}
-                                        </td>
-                                        <td style={{
-                                            padding: "12px",
-                                            borderBottom: "1px solid #eee",
-                                            textAlign: "center"
-                                        }}>
-                                            {log.previous_points}
-                                        </td>
-                                        <td style={{
-                                            padding: "12px",
-                                            borderBottom: "1px solid #eee",
-                                            textAlign: "center",
-                                            color: log.points_change > 0 ? "green" : "red",
-                                            fontWeight: "500"
-                                        }}>
-                                            {log.points_change > 0 ? `+${log.points_change}` : log.points_change}
-                                        </td>
-                                        <td style={{
-                                            padding: "12px",
-                                            borderBottom: "1px solid #eee",
-                                            textAlign: "center",
-                                            fontWeight: "600"
-                                        }}>
-                                            {log.new_points}
-                                        </td>
-                                        <td style={{
-                                            padding: "12px",
-                                            borderBottom: "1px solid #eee"
-                                        }}>
-                                            {log.reason || "No reason provided"}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <div style={{
-                            textAlign: "center",
-                            padding: "30px",
-                            color: "#666"
-                        }}>
-                            <p>No audit logs found for this driver.</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-    };
-
     return (
         <div style={{
             minHeight: "100vh",
@@ -358,9 +158,6 @@ function Points() {
             <Header />
 
             <main style={{ flex: "1", padding: "40px 20px" }}>
-                {/* Audit Log Modal */}
-                <AuditLogModal />
-                
                 {/* Notification */}
                 {notification.show && (
                     <div style={{
@@ -488,12 +285,6 @@ function Points() {
                                             textAlign: "center",
                                             fontWeight: "600"
                                         }}>Modify Points</th>
-                                        <th style={{
-                                            padding: "15px",
-                                            textAlign: "center",
-                                            fontWeight: "600",
-                                            width: "80px"
-                                        }}>History</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -607,35 +398,12 @@ function Points() {
                                                         />
                                                     </div>
                                                 </td>
-                                                <td style={{
-                                                    padding: "15px",
-                                                    borderBottom: "1px solid #eee",
-                                                    textAlign: "center"
-                                                }}>
-                                                    <button
-                                                        onClick={() => fetchAuditLogs(driver.driver_username)}
-                                                        style={{
-                                                            padding: "8px",
-                                                            backgroundColor: "#f0f0f0",
-                                                            color: "#333",
-                                                            border: "none",
-                                                            borderRadius: "6px",
-                                                            cursor: "pointer",
-                                                            display: "inline-flex",
-                                                            alignItems: "center",
-                                                            justifyContent: "center"
-                                                        }}
-                                                        title="View Audit History"
-                                                    >
-                                                        <FaHistory size={16} />
-                                                    </button>
-                                                </td>
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
                                             <td
-                                                colSpan="5"
+                                                colSpan="4"
                                                 style={{
                                                     padding: "30px",
                                                     textAlign: "center",

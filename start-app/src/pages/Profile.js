@@ -91,8 +91,8 @@ function Profile() {
         };
     
         try {
-            // const response = await fetch(`http://44.202.51.190:8000/api/update-profile/${username}/`, {
-            const response = await fetch(`http://localhost:8000/api/update-profile/${username}/`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/update-profile/${username}/`, {
+            //const response = await fetch(`http://localhost:8000/api/update-profile/${username}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

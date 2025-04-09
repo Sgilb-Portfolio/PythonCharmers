@@ -19,7 +19,7 @@ function Points() {
     // API Gateway URL for the audit logging Lambda
     const API_BASE_URL = "https://8pk70542fj.execute-api.us-east-1.amazonaws.com/prod";
     const AUDIT_API_URL = `${API_BASE_URL}/audit-logs`;
-    const GET_AUDIT_LOGS_URL = `${API_BASE_URL}/get-audit-logs`;
+    const GET_AUDIT_LOGS_URL = `${API_BASE_URL}/cloudwatch-logs`;
         useEffect(() => {
         fetchDrivers();
     }, []);

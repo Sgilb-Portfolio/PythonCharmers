@@ -16,6 +16,7 @@ import Cart from "./pages/Cart";
 import Purchase from "./pages/Purchase";
 import RoleProtection from "./components/RoleProtection";
 import Protection from "./components/Protection";
+import AuditLogs from "./pages/AuditLogs";
 
 function App() {
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/cart" element={<Protection><Cart /></Protection>} />
       <Route path="/purchase" element={<Protection><Purchase /></Protection>} />
+      <Route path="/audit-logs" element={<Protection><AuditLogs /></Protection>} />
     </Routes>
   );
 }

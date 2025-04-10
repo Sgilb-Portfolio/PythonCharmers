@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import HomePage1 from "../images/HomePage1.jpg";
 import HomePage2 from "../images/HomePage2.jpg";
@@ -6,11 +6,14 @@ import HomePage3 from "../images/HomePage3.jpg";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import axios from "axios";
 
 function Home() {
     const images = [HomePage1, HomePage2, HomePage3];
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [userRole, setUserRole] = useState("");
     const idToken = localStorage.getItem("IdToken") || null;
+    const username = localStorage.getItem("username");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,6 +22,18 @@ function Home() {
         }, 5000);
         return () => clearInterval(interval);
     }, [images.length]);
+
+    useEffect(() => {
+        if (username) {
+            axios.get(`/api/get-user-role/${username}/`)
+                .then((res) => {
+                    setUserRole(res.data.role);
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+    }, [username]);
 
     const nextSlide = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -221,6 +236,22 @@ function Home() {
                         <FaArrowRight size={14} />
                     </Link>
                 </div>
+                {idToken && (userRole === 'Sponsor' || userRole === 'Admin') && (
+                <div style={{ textAlign: "center", marginTop: "40px" }}>
+                    <Link to="/audit-logs" style={{
+                        padding: "14px 30px",
+                        backgroundColor: "#F56600",
+                        color: "white",
+                        textDecoration: "none",
+                        borderRadius: "30px",
+                        fontWeight: "600",
+                        boxShadow: "0 4px 10px rgba(245, 102, 0, 0.3)",
+                        transition: "transform 0.2s, box-shadow 0.2s"
+                    }}>
+                        View Audit Log Reports
+                    </Link>
+                </div>
+            )}
             </main>
 
             <Footer />

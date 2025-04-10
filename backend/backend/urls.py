@@ -24,6 +24,7 @@ from api.views import itunes_search
 from api.views import forgot_password
 from api.views import verify_mfa
 from api.views import get_profile, update_profile
+from api.views import get_user_role
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -34,6 +35,7 @@ urlpatterns = [
     path("api/confirm-cognito/", confirm_user, name="confirm_cognito"),
     path("api/login-cognito/", login_user, name="login_cognito"),
     path("api/protected-cognito/", protected_view, name="protected_cognito"),
+    path('api/get-user-role/<str:username>/', get_user_role, name='get-user-role'),
     path("api/reset-password/", reset_password, name="reset-password"),
     path("api/update-points/", update_points, name="update-points"),
     path("api/get-points/", get_points, name="get-points"),

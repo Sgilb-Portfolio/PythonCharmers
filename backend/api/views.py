@@ -21,6 +21,7 @@ from .cognito_auth import verify_mfa_code as cognito_verify_mfa
 from .models import FailedLoginAttempts
 import requests
 from .models import Prof
+from api.models import CustomUser
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -153,6 +154,14 @@ def login_user(request):
             failed_attempt.lockout_until = None
             failed_attempt.save()
         return JsonResponse(auth_result)
+    
+@csrf_exempt
+def get_user_role(request, username):
+    try:
+        user = CustomUser.objects.get(username=username)
+        return JsonResponse({'role': user.role})
+    except CustomUser.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
 
 @csrf_exempt 
 def reset_password(request):

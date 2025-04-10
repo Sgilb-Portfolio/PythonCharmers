@@ -25,6 +25,8 @@ SECRET_KEY = "django-insecure-s=8&-vwaab-m)6yk%1%30*c9py4ap+s^^h*z0lh6cz8j35zezw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Allows for user customization rather than using djangos default
+AUTH_USER_MODEL = 'api.CustomUser'
 
 
 # Application definition

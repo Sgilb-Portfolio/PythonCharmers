@@ -23,6 +23,10 @@ from api.views import register_user, confirm_user, login_user, protected_view, r
 from api.views import itunes_search
 from api.views import forgot_password
 from api.views import verify_mfa
+from django.http import HttpResponse
+
+def favicon_view(request):
+    return HttpResponse(status=204)
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -38,5 +42,6 @@ urlpatterns = [
     path("api/get-points/", get_points, name="get-points"),
     path("api/itunes-search/", itunes_search, name="itunes-search"),
     path("api/forgot-password/", forgot_password, name="forgot-password"),
-    path("api/verify-mfa/", verify_mfa, name="verify-mfa")
+    path("api/verify-mfa/", verify_mfa, name="verify-mfa"),
+    path("favicon.ico", favicon_view)
 ]

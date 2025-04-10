@@ -25,6 +25,10 @@ from api.views import forgot_password
 from api.views import verify_mfa
 from api.views import get_profile, update_profile
 from api.views import get_user_role
+from django.http import HttpResponse
+
+def favicon_view(request):
+    return HttpResponse(status=204)
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -44,4 +48,5 @@ urlpatterns = [
     path("api/verify-mfa/", verify_mfa, name="verify-mfa"),
     path("api/get-profile/<str:username>/", get_profile, name="get-profile"),
     path("api/update-profile/<str:username>/", update_profile, name="update-profile"),
+    path("favicon.ico", favicon_view)
 ]

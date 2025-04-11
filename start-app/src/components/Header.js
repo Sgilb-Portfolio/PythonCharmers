@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 
@@ -15,6 +15,29 @@ const Header = () => {
     const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
 
     const userRole = localStorage.getItem("userRole");
+    const isAdmin = userRole === "admin";
+    const isDriver = userRole === "driver";
+    const [driverPoints, setDriverPoints] = useState(null);
+    const username = localStorage.getItem("user");
+
+    useEffect(() => {
+        // Fetch driver points if the user is a driver
+        if (isDriver && username) {
+            fetchDriverPoints(username);
+        }
+    }, [isDriver, username]);
+
+    const fetchDriverPoints = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
+            if (response.ok) {
+                const data = await response.json();
+                setDriverPoints(data.points);
+            }
+        } catch (error) {
+            console.error("Error fetching driver points:", error);
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem("IdToken");
@@ -112,6 +135,17 @@ const Header = () => {
                         transition: "color 0.2s"
                     }}>Catalog</Link>
                 )}
+                
+                {/* Admin-only Audit Logs Link */}
+                {idToken && isAdmin && (
+                    <Link to="/audit-logs" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Audit Logs</Link>
+                )}
 
                 <Link to="/help" style={{
                     margin: "0 10px",
@@ -131,6 +165,24 @@ const Header = () => {
                 flex: "1",
                 justifyContent: "flex-end"
             }}>
+                {/* Display driver points if user is a driver - with cart styling */}
+                {idToken && isDriver && driverPoints !== null && (
+                    <Link to="/profile" style={{
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        padding: "8px 15px",
+                        borderRadius: "20px",
+                        border: "1px solid #ffffff",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
+                        transition: "all 0.2s"
+                    }}>
+                        <span>Points: {driverPoints}</span>
+                    </Link>
+                )}
+                
                 {idToken && (
                     // If logged in, show the cart count
                     <Link to="/cart" style={{
@@ -268,6 +320,28 @@ const Header = () => {
                         fontWeight: "500",
                         borderBottom: "1px solid #eee"
                     }}>Manage Points</Link>
+                    {idToken && isAdmin && (
+                        <Link to="/audit-logs" style={{
+                            display: "block",
+                            padding: "15px 10px",
+                            textDecoration: "none",
+                            color: "#555",
+                            fontWeight: "500",
+                            borderBottom: "1px solid #eee"
+                        }}>Audit Logs</Link>
+                    )}
+                    {idToken && isDriver && driverPoints !== null && (
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "15px 10px",
+                            color: "#555",
+                            fontWeight: "500",
+                            borderBottom: "1px solid #eee"
+                        }}>
+                            <span>Your Points: {driverPoints}</span>
+                        </div>
+                    )}
                     <Link to="/help" style={{
                         display: "block",
                         padding: "15px 10px",

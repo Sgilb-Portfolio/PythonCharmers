@@ -37,8 +37,8 @@ function Login() {
         setMessage(""); // Clear previous messages
     
         try {
-            //const response = await fetch("http://localhost:8000/api/login-cognito/", {
-            const response = await fetch("http://44.202.51.190:8000/api/login-cognito/", {
+            const response = await fetch("http://localhost:8000/api/login-cognito/", {
+            // const response = await fetch("http://44.202.51.190:8000/api/login-cognito/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,8 +98,8 @@ function Login() {
         setMessage("");
     
         try {
-            //const response = await fetch("http://localhost:8000/api/verify-mfa/", {
-            const response = await fetch("http://44.202.51.190:8000/api/verify-mfa/", {
+            const response = await fetch("http://localhost:8000/api/verify-mfa/", {
+            // const response = await fetch("http://44.202.51.190:8000/api/verify-mfa/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, mfa_code: otpCode, session }),

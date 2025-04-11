@@ -26,8 +26,8 @@ function Catalog() {
 
     const fetchData = () => {
         setLoading(true);
-        fetch(`http://44.202.51.190:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
-        //fetch(`http://localhost:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
+        // fetch(`http://44.202.51.190:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
+        fetch(`http://localhost:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
         .then(response => response.json())
             .then(data => {
                 if (data.results) {

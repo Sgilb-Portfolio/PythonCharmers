@@ -379,3 +379,33 @@ def audit_logs_view(request):
     except Exception as e:
         print(f'Error fetching logs: {e}')
         return JsonResponse({'error': 'Failed to fetch logs from CloudWatch'}, status=500)
+
+# Add this to your views.py file
+
+@csrf_exempt
+def get_driver_points_by_username(request, username):
+    """
+    Endpoint to fetch points for a specific driver by username.
+    
+    Usage: GET /api/get-driver-points/<username>
+    """
+    if request.method != "GET":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+        
+    try:
+        driver = Points.objects.get(driver_username=username)
+        return JsonResponse({
+            "success": True,
+            "points": driver.driver_points
+        })
+    except Points.DoesNotExist:
+        return JsonResponse({
+            "success": False,
+            "error": "Driver not found"
+        }, status=404)
+    except Exception as e:
+        print(f"Error fetching points for driver {username}: {str(e)}")
+        return JsonResponse({
+            "success": False,
+            "error": "Internal server error"
+        }, status=500)

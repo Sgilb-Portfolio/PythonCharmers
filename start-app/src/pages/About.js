@@ -17,8 +17,8 @@ function About() {
             return;
         }
 
-        // fetch("http://44.202.51.190:8000/api/about", {
-        fetch("http://localhost:8000/api/about", {
+        fetch("http://44.202.51.190:8000/api/about", {
+        // fetch("http://localhost:8000/api/about", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${idToken}`, // Send the token here
@@ -32,8 +32,8 @@ function About() {
                 setErrorMessage("An error occurred while fetching data.");
             });
 
-        // fetch("http://44.202.51.190:8000/api/aboutdata/", {
-        fetch("http://localhost:8000/api/aboutdata/", {
+        fetch("http://44.202.51.190:8000/api/aboutdata/", {
+        // fetch("http://localhost:8000/api/aboutdata/", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${idToken}`, // Include token in header

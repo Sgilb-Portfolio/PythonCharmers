@@ -29,7 +29,8 @@ const Header = () => {
 
     const fetchDriverPoints = async (username) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
+            // const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
+            const response = await fetch(`http://44.202.51.190:8000/api/get-driver-points/${username}`);
             if (response.ok) {
                 const data = await response.json();
                 setDriverPoints(data.points);

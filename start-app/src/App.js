@@ -65,12 +65,12 @@ function App() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/account-confirmation" element={<AccountConfirmation />} />
       <Route path="/profile" element={<Protection><Profile /></Protection>} />
-      <Route path="/points" element={<Points/>} />
+      <Route path="/points" element={<RoleProtection allowedRoles={["admin","sponsor"]}><Points /></RoleProtection>} />
       <Route path="/catalog" element={<Protection><Catalog /></Protection>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/cart" element={<Protection><Cart /></Protection>} />
       <Route path="/purchase" element={<Protection><Purchase /></Protection>} />
-      <Route path="/audit-logs" element={<AuditLogs />}/>
+      <Route path="/audit-logs" element={<RoleProtection allowedRoles={["admin"]}><AuditLogs /></RoleProtection>}/>
     </Routes>
   );
 }

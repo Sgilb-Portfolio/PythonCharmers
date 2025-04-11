@@ -24,6 +24,7 @@ from api.views import itunes_search
 from api.views import forgot_password
 from api.views import verify_mfa
 from api.views import get_profile, update_profile
+from api.views import audit_logs_view
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -42,4 +43,5 @@ urlpatterns = [
     path("api/verify-mfa/", verify_mfa, name="verify-mfa"),
     path("api/get-profile/<str:username>/", get_profile, name="get-profile"),
     path("api/update-profile/<str:username>/", update_profile, name="update-profile"),
+    path("api/audit-logs", audit_logs_view, name="audit-logs"),
 ]

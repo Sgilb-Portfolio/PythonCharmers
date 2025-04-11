@@ -8,8 +8,35 @@ function Points() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [pointInputs, setPointInputs] = useState({});
+    const [reasonInputs, setReasonInputs] = useState({}); // New state for reason dropdowns
     const [notification, setNotification] = useState({ show: false, message: "", type: "" });
     const [updating, setUpdating] = useState(null);
+
+    // Define common reasons for point changes
+    const commonReasons = [
+        // Positive Reasons
+        "On-time delivery excellence",
+        "Fuel efficiency achievement",
+        "Clean safety inspection",
+        "Customer commendation",
+        "Perfect attendance",
+        "Vehicle maintenance diligence",
+        "Mentor/training contribution",
+        "Hazard avoidance recognition",
+        "Long-term service milestone",
+        // Negative Reasons
+        "Late delivery",
+        "Safety violation",
+        "Customer complaint",
+        "Excessive idling",
+        "Missed check-in/paperwork",
+        "Avoidable accident/incident",
+        "Policy violation",
+        "Training non-compliance",
+        "Unauthorized route deviation",
+        // Other
+        "Other (specify in notes)"
+    ];
 
     // API Gateway URL for the audit logging Lambda
     const API_BASE_URL = "https://8pk70542fj.execute-api.us-east-1.amazonaws.com/prod";
@@ -35,10 +62,18 @@ function Points() {
         }
     };
 
-    // Handle input change
+    // Handle input change for points
     const handleInputChange = (username, value) => {
         setPointInputs((prevInputs) => ({
             ...prevInputs,
+            [username]: value,
+        }));
+    };
+
+    // Handle select change for reasons
+    const handleReasonChange = (username, value) => {
+        setReasonInputs((prevReasons) => ({
+            ...prevReasons,
             [username]: value,
         }));
     };
@@ -54,9 +89,6 @@ function Points() {
     // Log audit event to AWS Lambda via API Gateway
     async function logAuditEvent(eventData) {
         try {
-            // Get the reason for this point change
-            const reason = document.getElementById(`reason-${eventData.username}`)?.value || "No reason provided";
-            
             const response = await fetch(AUDIT_API_URL, {
                 method: "POST",
                 headers: {
@@ -68,7 +100,7 @@ function Points() {
                     previous_points: eventData.previousPoints,
                     points_change: eventData.pointsChange,
                     new_points: eventData.newPoints,
-                    reason: reason,
+                    reason: eventData.reason, // Use the selected reason from state
                     event_type: "POINTS_UPDATE"
                 })
             });
@@ -88,9 +120,16 @@ function Points() {
     // Handle updating points (add or subtract)
     const handleUpdatePoints = async (username) => {
         const pointsToChange = parseInt(pointInputs[username], 10);
+        const selectedReason = reasonInputs[username];
 
         if (isNaN(pointsToChange) || pointsToChange === 0) {
             showNotification("Please enter a valid number (positive or negative).", "error");
+            return;
+        }
+
+        // Check if a reason was selected
+        if (!selectedReason) {
+            showNotification("Please select a reason for the point change.", "error");
             return;
         }
 
@@ -121,7 +160,8 @@ function Points() {
                 username,
                 previousPoints,
                 pointsChange: pointsToChange,
-                newPoints: data.new_points
+                newPoints: data.new_points,
+                reason: selectedReason
             });
 
             // Optimistic UI update
@@ -133,10 +173,14 @@ function Points() {
                 )
             );
 
-            // Clear input field
+            // Clear input fields
             setPointInputs((prevInputs) => ({
                 ...prevInputs,
                 [username]: "",
+            }));
+            setReasonInputs((prevReasons) => ({
+                ...prevReasons,
+                [username]: "", // Clear the reason after successful update
             }));
 
             showNotification(`Successfully updated ${username}'s points!`, "success");
@@ -383,19 +427,50 @@ function Points() {
                                                                 )}
                                                             </button>
                                                         </div>
-                                                        {/* Reason input for audit logging */}
-                                                        <input
+                                                        {/* Reason dropdown for audit logging */}
+                                                        <select
                                                             id={`reason-${driver.driver_username}`}
-                                                            type="text"
-                                                            placeholder="Reason for change (optional)"
+                                                            value={reasonInputs[driver.driver_username] || ""}
+                                                            onChange={(e) => handleReasonChange(driver.driver_username, e.target.value)}
                                                             style={{
                                                                 width: "100%",
                                                                 padding: "8px 12px",
-                                                                border: "1px solid #ddd",
+                                                                border: !reasonInputs[driver.driver_username] && pointInputs[driver.driver_username] 
+                                                                    ? "1px solid #F44336" // Highlight in red if a point value is entered but no reason selected
+                                                                    : "1px solid #ddd",
                                                                 borderRadius: "6px",
-                                                                fontSize: "14px"
+                                                                fontSize: "14px",
+                                                                backgroundColor: "white"
                                                             }}
-                                                        />
+                                                            required
+                                                        >
+                                                            <option value="">Select reason for point change (required)</option>
+                                                            <optgroup label="Positive Reasons">
+                                                                <option value="On-time delivery excellence">On-time delivery excellence</option>
+                                                                <option value="Fuel efficiency achievement">Fuel efficiency achievement</option>
+                                                                <option value="Clean safety inspection">Clean safety inspection</option>
+                                                                <option value="Customer commendation">Customer commendation</option>
+                                                                <option value="Perfect attendance">Perfect attendance</option>
+                                                                <option value="Vehicle maintenance diligence">Vehicle maintenance diligence</option>
+                                                                <option value="Mentor/training contribution">Mentor/training contribution</option>
+                                                                <option value="Hazard avoidance recognition">Hazard avoidance recognition</option>
+                                                                <option value="Long-term service milestone">Long-term service milestone</option>
+                                                            </optgroup>
+                                                            <optgroup label="Negative Reasons">
+                                                                <option value="Late delivery">Late delivery</option>
+                                                                <option value="Safety violation">Safety violation</option>
+                                                                <option value="Customer complaint">Customer complaint</option>
+                                                                <option value="Excessive idling">Excessive idling</option>
+                                                                <option value="Missed check-in/paperwork">Missed check-in/paperwork</option>
+                                                                <option value="Avoidable accident/incident">Avoidable accident/incident</option>
+                                                                <option value="Policy violation">Policy violation</option>
+                                                                <option value="Training non-compliance">Training non-compliance</option>
+                                                                <option value="Unauthorized route deviation">Unauthorized route deviation</option>
+                                                            </optgroup>
+                                                            <optgroup label="Other">
+                                                                <option value="Other (specify in notes)">Other (specify in notes)</option>
+                                                            </optgroup>
+                                                        </select>
                                                     </div>
                                                 </td>
                                             </tr>

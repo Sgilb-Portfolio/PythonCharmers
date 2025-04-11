@@ -21,6 +21,7 @@ from .cognito_auth import verify_mfa_code as cognito_verify_mfa
 from .models import FailedLoginAttempts
 import requests
 from .models import Prof
+from .cloudwatch_logs import get_audit_logs
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -364,3 +365,17 @@ def update_profile(request, username):
             return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def audit_logs_view(request):
+    log_group = request.GET.get('logGroup')
+
+    if not log_group:
+        return JsonResponse({'error': 'Missing logGroup parameter'}, status=400)
+
+    try:
+        logs = get_audit_logs(log_group)
+        return JsonResponse(logs, safe=False)
+    except Exception as e:
+        print(f'Error fetching logs: {e}')
+        return JsonResponse({'error': 'Failed to fetch logs from CloudWatch'}, status=500)

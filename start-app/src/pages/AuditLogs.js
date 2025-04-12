@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import Header from "../components/Header";
+import Footer from "../components/Footer"
 
 function AuditLogs() {
   const [logs, setLogs] = useState([]);
@@ -583,6 +585,8 @@ function AuditLogs() {
   };
 
   return (
+    <>
+    <Header/>
     <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>System Audit Logs</h1>
@@ -881,6 +885,8 @@ function AuditLogs() {
         </>
       )}
     </div>
+    <Footer/>
+    </>
   );
 }
 

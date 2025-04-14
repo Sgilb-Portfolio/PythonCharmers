@@ -23,6 +23,7 @@ import requests
 from .models import Prof
 from .cloudwatch_logs import get_audit_logs
 from .models import Sponsor
+from .models import Application
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -410,7 +411,8 @@ def get_driver_points_by_username(request, username):
             "success": False,
             "error": "Internal server error"
         }, status=500)
-    
+
+@csrf_exempt    
 def get_sponsors(request):
     sponsors = Sponsor.objects.all()
     data = [
@@ -422,6 +424,7 @@ def get_sponsors(request):
     ]
     return JsonResponse(data, safe=False)
 
+@csrf_exempt
 def get_sponsor_details(request, sponsor_id):
     try:
         sponsor = Sponsor.objects.get(sponsor_id=sponsor_id)
@@ -436,3 +439,27 @@ def get_sponsor_details(request, sponsor_id):
         return JsonResponse({
             "error": "Sponsor not found"
         }, status=404)
+   
+@csrf_exempt
+def apply_sponsor(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        username = data.get('username')
+        sponsor_id = data.get('sponsor_id')
+        status = data.get('status', 'pending')
+        try:
+            user = Account.objects.get(account_username=username)
+            sponsor = Sponsor.objects.get(pk=sponsor_id)
+            application = Application(
+                account_username=user,
+                sponsor=sponsor,
+                application_status=status,
+                application_at=datetime.now()
+            )
+            application.save()
+            return JsonResponse({'message': 'Application submitted successfully!'}, status=201)
+        except Account.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except Sponsor.DoesNotExist:
+            return JsonResponse({'error': 'Sponsor not found'}, status=404)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

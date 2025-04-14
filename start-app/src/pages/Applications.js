@@ -9,6 +9,7 @@ function Applications() {
     const [selectedSponsor, setSelectedSponsor] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const user = localStorage.getItem("user");
     /*const [formData, setFormData] = useState({
         driverName: "",
         companyName: "",
@@ -55,6 +56,30 @@ function Applications() {
                 .then((res) => res.json())
                 .then((data) => setSelectedSponsor(data));
         }
+    };
+
+    const handleApply = (sponsor_id) => {
+        const applicationData = {
+            username: user,
+            sponsor_id: sponsor_id,
+            status: "pending",
+        };
+        fetch("http://localhost:8000/api/apply-sponsor/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(applicationData),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                alert("Application submitted successfully!");
+                console.log(data);
+            })
+            .catch((error) => {
+                alert("Error submitting the application.");
+                console.error("Error:", error);
+            });
     };
 
     return (
@@ -152,6 +177,21 @@ function Applications() {
                                                 }}
                                             >
                                                 {selectedSponsor?.sponsor_id === sponsor.sponsor_id ? "Hide Info" : "More Info"}
+                                            </button>
+                                            <button
+                                                onClick={() => handleApply(sponsor.sponsor_id)}
+                                                style={{
+                                                    padding: "8px 14px",
+                                                    backgroundColor: "#28a745",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    fontWeight: "500",
+                                                    marginLeft: "10px"
+                                                }}
+                                            >
+                                                Apply
                                             </button>
                                         </div>
 

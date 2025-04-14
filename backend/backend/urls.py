@@ -27,6 +27,7 @@ from api.views import get_profile, update_profile
 from api.views import audit_logs_view
 from api.views import get_driver_points_by_username
 from api.views import get_sponsors, get_sponsor_details
+from api.views import apply_sponsor
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -49,4 +50,5 @@ urlpatterns = [
     path('api/get-driver-points/<str:username>', get_driver_points_by_username, name='get_driver_points_by_username'),
     path('api/get-sponsors/', get_sponsors, name='get-sponsors'),
     path('api/get-sponsor-details/<int:sponsor_id>/', get_sponsor_details, name='get-sponsor-details'),
+    path('api/apply-sponsor/', apply_sponsor, name='apply-sponsor'),
 ]

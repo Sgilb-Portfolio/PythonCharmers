@@ -22,6 +22,7 @@ from .models import FailedLoginAttempts
 import requests
 from .models import Prof
 from .cloudwatch_logs import get_audit_logs
+from .models import Sponsor
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -409,3 +410,29 @@ def get_driver_points_by_username(request, username):
             "success": False,
             "error": "Internal server error"
         }, status=500)
+    
+def get_sponsors(request):
+    sponsors = Sponsor.objects.all()
+    data = [
+        {
+            "sponsor_id": sponsor.sponsor_id,
+            "sponsor_name": sponsor.sponsor_name,
+        }
+        for sponsor in sponsors
+    ]
+    return JsonResponse(data, safe=False)
+
+def get_sponsor_details(request, sponsor_id):
+    try:
+        sponsor = Sponsor.objects.get(sponsor_id=sponsor_id)
+        data = {
+            "sponsor_id": sponsor.sponsor_id,
+            "sponsor_name": sponsor.sponsor_name,
+            "sponsor_rules": sponsor.sponsor_rules,
+            "sponsor_pt_amt": str(sponsor.sponsor_pt_amt),
+        }
+        return JsonResponse(data)
+    except Sponsor.DoesNotExist:
+        return JsonResponse({
+            "error": "Sponsor not found"
+        }, status=404)

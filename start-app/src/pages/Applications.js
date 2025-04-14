@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function Applications() {
-    const [formData, setFormData] = useState({
+    const [sponsors, setSponsors] = useState([]);
+    const [selectedSponsor, setSelectedSponsor] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    /*const [formData, setFormData] = useState({
         driverName: "",
         companyName: "",
         reason: "",
         date: "",
-    });
+    });*/
 
-    const [successMessage, setSuccessMessage] = useState("");
+    //const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         document.title = "Sponsorship Application";
+        setLoading(true);
+        fetch("http://localhost:8000/api/get-sponsors/")
+            .then((res) => res.json())
+            .then((data) => {
+                setSponsors(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError("Failed to fetch sponsors");
+                setLoading(false);
+            });
     }, []);
 
-    const handleChange = (e) => {
+    /*const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -29,6 +45,16 @@ function Applications() {
         setFormData({ driverName: "", companyName: "", reason: "", date: "" });
         setSuccessMessage("Application submitted succesfully!");
         setTimeout(() => setSuccessMessage(""), 7000);
+    };*/
+
+    const handleMoreInfo = (sponsor_id) => {
+        if (selectedSponsor && selectedSponsor.sponsor_id === sponsor_id) {
+            setSelectedSponsor(null);
+        } else {
+            fetch(`http://localhost:8000/api/get-sponsor-details/${sponsor_id}/`)
+                .then((res) => res.json())
+                .then((data) => setSelectedSponsor(data));
+        }
     };
 
     return (
@@ -40,13 +66,130 @@ function Applications() {
             flexDirection: "column"
         }}>
             <Header />
-            
+
             <main style={{ flex: "1", padding: "40px 20px" }}>
-                {/* Your existing applications page content */}
-                {/* ... */}
+                {/* Notification */}
+                {error && (
+                    <div style={{
+                        position: "fixed",
+                        top: "20px",
+                        right: "20px",
+                        padding: "15px 25px",
+                        borderRadius: "8px",
+                        backgroundColor: "#F44336",
+                        color: "white",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        zIndex: 1000,
+                        animation: "slideIn 0.3s ease-out forwards"
+                    }}>
+                        {error}
+                    </div>
+                )}
+
+                <div style={{
+                    maxWidth: "1000px",
+                    margin: "0 auto",
+                    backgroundColor: "white",
+                    borderRadius: "12px",
+                    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
+                    overflow: "hidden"
+                }}>
+                    <div style={{
+                        padding: "25px 30px",
+                        borderBottom: "1px solid #eee",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center"
+                    }}>
+                        <h2 style={{
+                            fontSize: "28px",
+                            fontWeight: "700",
+                            color: "#333",
+                            margin: 0
+                        }}>
+                            Sponsorship Applications
+                        </h2>
+                    </div>
+
+                    {loading ? (
+                        <div style={{
+                            padding: "50px 0",
+                            textAlign: "center",
+                            color: "#666"
+                        }}>
+                            <FaSpinner style={{
+                                fontSize: "30px",
+                                animation: "spin 1s linear infinite",
+                                marginBottom: "15px",
+                                color: "#F56600"
+                            }} />
+                            <p style={{ fontSize: "16px" }}>Loading sponsor data...</p>
+                        </div>
+                    ) : (
+                        <div style={{ padding: "20px" }}>
+                            <ul style={{ listStyle: "none", paddingLeft: "0" }}>
+                                {sponsors.map((sponsor) => (
+                                    <li key={sponsor.sponsor_id} style={{ marginBottom: "20px" }}>
+                                        <div>
+                                            <span style={{
+                                                fontSize: "20px",
+                                                fontWeight: "700",
+                                                color: "#333"
+                                            }}>
+                                                {sponsor.sponsor_name}
+                                            </span>
+                                            <button
+                                                onClick={() => handleMoreInfo(sponsor.sponsor_id)}
+                                                style={{
+                                                    padding: "8px 14px",
+                                                    backgroundColor: "#F56600",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    fontWeight: "500",
+                                                    marginLeft: "10px"
+                                                }}
+                                            >
+                                                {selectedSponsor?.sponsor_id === sponsor.sponsor_id ? "Hide Info" : "More Info"}
+                                            </button>
+                                        </div>
+
+                                        {/* Conditionally render the dropdown-style extra info */}
+                                        {selectedSponsor?.sponsor_id === sponsor.sponsor_id && (
+                                            <div style={{
+                                                marginTop: "10px",
+                                                padding: "15px",
+                                                backgroundColor: "#fff",
+                                                border: "1px solid #eee",
+                                                borderRadius: "8px",
+                                                boxShadow: "0 4px 8px rgba(0,0,0,0.1)"
+                                            }}>
+                                                <p><strong>Rules:</strong> {selectedSponsor.sponsor_rules}</p>
+                                                <p><strong>Point Amount:</strong> ${selectedSponsor.sponsor_pt_amt}</p>
+                                            </div>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
             </main>
-            
+
             <Footer />
+
+            {/* Add necessary CSS animations */}
+            <style jsx>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                @keyframes slideIn {
+                    0% { transform: translateX(100%); opacity: 0; }
+                    100% { transform: translateX(0); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 }

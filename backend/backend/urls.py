@@ -28,6 +28,9 @@ from api.views import audit_logs_view
 from api.views import get_driver_points_by_username
 from api.views import get_sponsors, get_sponsor_details
 from api.views import apply_sponsor
+from api.views import get_sponsor_applications
+from api.views import update_application_status
+from api.views import get_driver_applications
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -51,4 +54,7 @@ urlpatterns = [
     path('api/get-sponsors/', get_sponsors, name='get-sponsors'),
     path('api/get-sponsor-details/<int:sponsor_id>/', get_sponsor_details, name='get-sponsor-details'),
     path('api/apply-sponsor/', apply_sponsor, name='apply-sponsor'),
+    path('api/get-sponsor-applications/', get_sponsor_applications, name='get-sponsor-applications'),
+    path('api/update-application-status/', update_application_status, name='update-application-status'),
+    path('api/get-driver-applications/', get_driver_applications, name='get-driver-applications'),
 ]

@@ -10,6 +10,7 @@ function Applications() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const user = localStorage.getItem("user");
+    const [myApplications, setMyApplications] = useState([]);
     /*const [formData, setFormData] = useState({
         driverName: "",
         companyName: "",
@@ -33,6 +34,23 @@ function Applications() {
                 setLoading(false);
             });
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+    
+        fetch("http://localhost:8000/api/get-driver-applications/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: user }),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            setMyApplications(data);
+        })
+        .catch((err) => {
+            console.error("Failed to fetch driver applications", err);
+        });
+    }, [user]);
 
     /*const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -71,15 +89,19 @@ function Applications() {
             },
             body: JSON.stringify(applicationData),
         })
-            .then((response) => response.json())
-            .then((data) => {
-                alert("Application submitted successfully!");
-                console.log(data);
-            })
-            .catch((error) => {
-                alert("Error submitting the application.");
-                console.error("Error:", error);
-            });
+        .then(async (response) => {
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message || "Application submitted successfully!");
+            } else {
+                alert(data.error || "An error occurred while submitting the application.");
+            }
+            console.log(data);
+        })
+        .catch((error) => {
+            alert("Network error. Please try again.");
+            console.error("Error:", error);
+        });
     };
 
     return (
@@ -194,8 +216,6 @@ function Applications() {
                                                 Apply
                                             </button>
                                         </div>
-
-                                        {/* Conditionally render the dropdown-style extra info */}
                                         {selectedSponsor?.sponsor_id === sponsor.sponsor_id && (
                                             <div style={{
                                                 marginTop: "10px",
@@ -212,8 +232,51 @@ function Applications() {
                                     </li>
                                 ))}
                             </ul>
+
+                            {myApplications.length > 0 && (
+                                <div style={{
+                                    marginTop: "40px",
+                                    paddingTop: "20px",
+                                    borderTop: "2px solid #eee"
+                                }}>
+                                    <h3 style={{
+                                        fontSize: "24px",
+                                        fontWeight: "600",
+                                        marginBottom: "20px",
+                                        color: "#333"
+                                    }}>
+                                        My Submitted Applications
+                                    </h3>
+                                    <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+                                        {myApplications.map((app, index) => (
+                                            <li key={index} style={{
+                                                marginBottom: "15px",
+                                                padding: "15px",
+                                                border: "1px solid #ddd",
+                                                borderRadius: "8px",
+                                                backgroundColor: "#fafafa"
+                                            }}>
+                                                <p><strong>Sponsor:</strong> {app.sponsor_name}</p>
+                                                <p><strong>Status:</strong> <span style={{
+                                                    color:
+                                                        app.status === "pending"
+                                                            ? "#f57c00"
+                                                            : app.status === "accepted"
+                                                            ? "#28a745"
+                                                            : "#dc3545",
+                                                    fontWeight: "600"
+                                                }}>{app.status}</span></p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
                         </div>
                     )}
+
+                    
+
                 </div>
             </main>
 

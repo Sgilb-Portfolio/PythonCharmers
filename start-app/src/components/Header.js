@@ -107,7 +107,7 @@ const Header = () => {
                     transition: "color 0.2s"
                 }}>About</Link>
 
-                {idToken && (
+                {idToken && (userRole === "driver") && (
                     <Link to="/applications" style={{
                         margin: "0 10px",
                         textDecoration: "none",
@@ -125,6 +125,16 @@ const Header = () => {
                         fontWeight: "500",
                         transition: "color 0.2s"
                     }}>Manage Points</Link>
+                )}
+
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/sponsor-applications" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Applications</Link>
                 )}
 
                 {idToken && (

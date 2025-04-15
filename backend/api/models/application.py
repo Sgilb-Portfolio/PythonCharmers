@@ -11,3 +11,4 @@ class Application(models.Model):
     class Meta:
         managed = False
         db_table = 'application'
+        unique_together = ('account_username', 'sponsor')

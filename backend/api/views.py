@@ -24,6 +24,7 @@ from .models import Prof
 from .cloudwatch_logs import get_audit_logs
 from .models import Sponsor
 from .models import Application
+from .models import SponsorUser
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -450,6 +451,8 @@ def apply_sponsor(request):
         try:
             user = Account.objects.get(account_username=username)
             sponsor = Sponsor.objects.get(pk=sponsor_id)
+            if Application.objects.filter(account_username=user, sponsor=sponsor).exists():
+                return JsonResponse({'message': 'You have already applied to this sponsor.'}, status=201)
             application = Application(
                 account_username=user,
                 sponsor=sponsor,
@@ -463,3 +466,70 @@ def apply_sponsor(request):
         except Sponsor.DoesNotExist:
             return JsonResponse({'error': 'Sponsor not found'}, status=404)
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+@csrf_exempt
+def get_sponsor_applications(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            if not username:
+                return JsonResponse({'error': 'Username is required'}, status=400)
+            try:
+                account = Account.objects.get(account_username=username)
+            except Account.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            sponsor_ids = SponsorUser.objects.filter(account=account).values_list('sponsor_id', flat=True)
+            applications = Application.objects.filter(sponsor_id__in=sponsor_ids, application_status='pending')
+            results = [
+                {
+                    'application_id': app.application_id,
+                    'driver': app.account_username,
+                    'sponsor': app.sponsor,
+                    'status': app.application_status,
+                    'applied_at': app.application_at.strftime("%Y-%m-%d %H:%M:%S"),
+                }
+                for app in applications
+            ]
+            return JsonResponse(results, safe=False, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+@csrf_exempt
+def update_application_status(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        app_id = data.get("application_id")
+        new_status = data.get("status")
+        try:
+            app = Application.objects.get(pk=app_id)
+            app.application_status = new_status
+            app.save()
+            return JsonResponse({"message": "Status updated"})
+        except Application.DoesNotExist:
+            return JsonResponse({"error": "Application not found"}, status=404)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+@csrf_exempt
+def get_driver_applications(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        username = data.get("username")
+        try:
+            driver = Account.objects.get(account_username=username)
+            applications = Application.objects.filter(account_username=driver).select_related('sponsor')
+            result = [
+                {
+                    'application_id': app.application_id,
+                    'sponsor_name': app.sponsor.sponsor_name,
+                    'status': app.application_status,
+                    'applied_at': app.application_at.strftime('%Y-%m-%d %H:%M:%S'),
+                }
+                for app in applications
+            ]
+            return JsonResponse(result, safe=False)
+        except Account.DoesNotExist:
+            return JsonResponse({'error': 'Driver not found.'}, status=404)
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)

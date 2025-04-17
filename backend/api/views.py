@@ -489,8 +489,8 @@ def get_sponsor_applications(request):
             results = [
                 {
                     'application_id': app.application_id,
-                    'driver': app.account_username,
-                    'sponsor': app.sponsor,
+                    'driver': app.account_username.account_username,
+                    'sponsor': app.sponsor.sponsor_name,
                     'status': app.application_status,
                     'applied_at': app.application_at.strftime("%Y-%m-%d %H:%M:%S"),
                 }

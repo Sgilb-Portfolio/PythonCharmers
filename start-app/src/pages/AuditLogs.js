@@ -60,10 +60,10 @@ function AuditLogs() {
         // if (selectedDriver) queryParams.append('username', selectedDriver);
         
         const responses = await Promise.all([
-          fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
-          // fetch('http://localhost:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
-          fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
-          // fetch('http://localhost:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
+          // fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
+          fetch('http://localhost:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
+          // fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
+          fetch('http://localhost:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
         ]);
         
         const results = await Promise.all(responses.map(res => res.json()));
@@ -433,93 +433,6 @@ function AuditLogs() {
     }
   }, []);
 
-  // Convert to CSV function - memoized if needed
-  const convertToCSV = useCallback((logs) => {
-    if (logs.length === 0) return '';
-    
-    // Get all unique message keys for headers (excluding the fields we don't want)
-    const allMessageKeys = new Set();
-    logs.forEach(log => {
-      if (log.parsedMessage) {
-        Object.keys(log.parsedMessage).forEach(key => {
-          const isDriverPoints = log.log_type === 'driver_points';
-          const exclusionList = isDriverPoints 
-            ? [...excludedFields, ...driverPointsExcludedFields] 
-            : excludedFields;
-          
-          // Exclude any variation of username fields (case-insensitive)
-          const isUsernameField = key.toLowerCase().includes('username') || 
-                                  key.toLowerCase() === 'username' ||
-                                  key.toLowerCase() === 'user_name' ||
-                                  key.toLowerCase() === 'driver_username' ||
-                                  key.toLowerCase() === 'userName';
-          
-          if (!exclusionList.includes(key) && key !== 'requestId' && !isUsernameField) {
-            allMessageKeys.add(key);
-          }
-        });
-      }
-    });
-    
-    // Create headers with timestamp, log type + all message keys
-    const headers = ['timestamp', 'log_type', 'username'];
-    if (selectedLogType !== 'driver_points') {
-      headers.push('eventType');
-    }
-    headers.push(...Array.from(allMessageKeys).filter(key => {
-      if (selectedLogType === 'driver_points') {
-        return !driverPointsExcludedFields.includes(key) && key !== 'eventType';
-      }
-      return key !== 'eventType';
-    }));
-    
-    const csvRows = [headers.join(',')];
-    
-    // Add data rows
-    logs.forEach(log => {
-      const rowData = {
-        timestamp: new Date(log.timestamp).toLocaleString(),
-        log_type: getLogTypeName(log.log_type),
-        username: log.username || '',
-        eventType: log.eventType || ''
-      };
-      
-      // Try to get data from parsedMessage if it exists
-      if (log.parsedMessage) {
-        const headerStartIndex = log.log_type === 'driver_points' ? 3 : 4;
-        headers.slice(headerStartIndex).forEach(key => {
-          let value = log.parsedMessage[key];
-          // Handle nested arrays or objects
-          if (Array.isArray(value)) {
-            value = value.join(';');
-          } else if (typeof value === 'object' && value !== null) {
-            value = JSON.stringify(value).replace(/,/g, ';');
-          }
-          rowData[key] = value !== undefined ? String(value).replace(/,/g, ';') : '';
-        });
-      }
-      
-      // Add row to CSV
-      csvRows.push(headers.map(header => rowData[header] || '').join(','));
-    });
-    
-    return csvRows.join('\n');
-  }, [excludedFields, driverPointsExcludedFields, selectedLogType, getLogTypeName]);
-
-  // Download CSV function
-  const downloadCSV = useCallback(() => {
-    const csvContent = convertToCSV(sortedLogs);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `system_audit_logs_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);  // Clean up the URL object
-  }, [sortedLogs, convertToCSV]);
-
   // Determine whether to show the Event Type column
   const showEventTypeColumn = selectedLogType !== 'driver_points';
 
@@ -573,14 +486,6 @@ function AuditLogs() {
       border: '1px solid #e2e8f0',
       marginLeft: '10px',
       marginRight: '10px'
-    },
-    downloadButtonStyle: {
-      border: '1px solid #d1d5db',
-      padding: '6px 12px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      marginLeft: '10px',
-      backgroundColor: '#f9fafb'
     }
   };
 
@@ -635,14 +540,6 @@ function AuditLogs() {
               ))}
             </select>
           </div>
-          
-          <button 
-            onClick={downloadCSV}
-            disabled={filteredLogs.length === 0}
-            style={{ ...(filteredLogs.length === 0 ? styles.disabledButtonStyle : styles.downloadButtonStyle), marginBottom: '10px' }}
-          >
-            Download CSV
-          </button>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>

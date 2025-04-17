@@ -22,6 +22,8 @@ from .models import FailedLoginAttempts
 import requests
 from .models import Prof
 from .cloudwatch_logs import get_audit_logs
+from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -409,3 +411,109 @@ def get_driver_points_by_username(request, username):
             "success": False,
             "error": "Internal server error"
         }, status=500)
+
+@csrf_exempt
+@require_GET
+def view_as_driver(request, driver_id):
+    try:
+        driver = Points.objects.get(driver_id=driver_id)
+        driver_data = {
+            "driver_id": driver.driver_id,
+            "username": driver.driver_username,
+            "points": driver.driver_points
+        }
+        return JsonResponse({
+            "view_as": "driver",
+            "data": driver_data
+        })
+    except Points.DoesNotExist:
+        return JsonResponse({"error": "Driver not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def reports_view(request):
+    """
+    API view for generating various reports from CloudWatch logs
+    """
+    # Get parameters from request
+    report_type = request.GET.get('report_type', 'driver_activity')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    username = request.GET.get('username')
+    
+    # Determine which log group to query based on report type
+    log_group = None
+    if report_type == 'driver_activity':
+        log_group = '/driver-points/audit-logs'  # Using your existing audit logs that contain driver activities
+    elif report_type == 'point_transactions':
+        log_group = '/driver-points/audit-logs'  # Same log group, but will filter for point transactions
+    elif report_type == 'login_summary':
+        log_group = 'Team06-Cognito-Cloudtrail-AuditLogs'  # Using your Cognito logs for login data
+    elif report_type == 'system_usage':
+        log_group = 'Team06-Cognito-Cloudtrail-AuditLogs'  # Same logs, filtered for system usage
+    elif report_type == 'security_events':
+        log_group = 'Team06-Cognito-Cloudtrail-AuditLogs'  # Same logs, filtered for security events
+    else:
+        return JsonResponse({'error': 'Invalid report type'}, status=400)
+    
+    try:
+        # Use your existing get_audit_logs function
+        logs = get_audit_logs(log_group)
+        
+        # Post-process the logs based on report type and filters
+        filtered_logs = []
+        for log in logs:
+            # Parse the log message to extract needed data
+            try:
+                message = json.loads(log.get('message', '{}'))
+                
+                # Filter by username if specified
+                if username and message.get('driver_username') != username and message.get('username') != username:
+                    continue
+                
+                # Filter by date range if specified
+                log_timestamp = log.get('timestamp')
+                if start_date and log_timestamp < start_date:
+                    continue
+                if end_date and log_timestamp > end_date:
+                    continue
+                
+                # Filter and transform based on report type
+                if report_type == 'point_transactions' and 'point_change' in message:
+                    filtered_logs.append({
+                        'timestamp': log_timestamp,
+                        'username': message.get('driver_username', message.get('username', 'Unknown')),
+                        'point_change': message.get('point_change'),
+                        'reason': message.get('reason', 'Not specified'),
+                        'current_points': message.get('current_points', 0)
+                    })
+                elif report_type == 'driver_activity':
+                    # Include all driver activity logs
+                    filtered_logs.append({
+                        'timestamp': log_timestamp,
+                        'username': message.get('driver_username', message.get('username', 'Unknown')),
+                        'activity_type': message.get('activity_type', message.get('event_type', 'Unknown')),
+                        'point_change': message.get('point_change', 0),
+                        'details': message.get('details', 'No details provided')
+                    })
+                elif report_type == 'login_summary' and message.get('eventType') in ['SignIn', 'SignOut']:
+                    # Process login events
+                    filtered_logs.append({
+                        'timestamp': log_timestamp,
+                        'username': message.get('userName', 'Unknown'),
+                        'event_type': message.get('eventType'),
+                        'success': message.get('eventResponse') == 'Pass'
+                    })
+                # Add other report types as needed
+            
+            except json.JSONDecodeError:
+                # Skip logs with invalid JSON
+                continue
+        
+        # Return the filtered and processed logs
+        return JsonResponse(filtered_logs, safe=False)
+    
+    except Exception as e:
+        print(f'Error generating report: {e}')
+        return JsonResponse({'error': f'Failed to generate report: {str(e)}'}, status=500)

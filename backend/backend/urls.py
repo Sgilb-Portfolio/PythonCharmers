@@ -26,6 +26,8 @@ from api.views import verify_mfa
 from api.views import get_profile, update_profile
 from api.views import audit_logs_view
 from api.views import get_driver_points_by_username
+from api.views import view_as_driver
+from api.views import reports_view
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -46,4 +48,6 @@ urlpatterns = [
     path("api/update-profile/<str:username>/", update_profile, name="update-profile"),
     path("api/audit-logs", audit_logs_view, name="audit-logs"),
     path('api/get-driver-points/<str:username>', get_driver_points_by_username, name='get_driver_points_by_username'),
+    path('api/view-as-driver/<int:driver_id>', view_as_driver),
+    path('api/reports', reports_view, name="reports"),
 ]

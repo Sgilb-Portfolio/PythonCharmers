@@ -29,8 +29,8 @@ function Profile() {
         const fetchProfileData = async () => {
             const username = localStorage.getItem("user");
             try {
-                const response = await fetch(`http://44.202.51.190:8000/api/get-profile/${username}/`);
-                // const response = await fetch(`http://localhost:8000/api/get-profile/${username}/`);
+                // const response = await fetch(`http://44.202.51.190:8000/api/get-profile/${username}/`);
+                const response = await fetch(`http://localhost:8000/api/get-profile/${username}/`);
                 if (response.ok) {
                     const data = await response.json();
                     setBio(data.prof_bio);
@@ -91,8 +91,8 @@ function Profile() {
         };
     
         try {
-            const response = await fetch(`http://44.202.51.190:8000/api/update-profile/${username}/`, {
-            // const response = await fetch(`http://localhost:8000/api/update-profile/${username}/`, {
+            // const response = await fetch(`http://44.202.51.190:8000/api/update-profile/${username}/`, {
+            const response = await fetch(`http://localhost:8000/api/update-profile/${username}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

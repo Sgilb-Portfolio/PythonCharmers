@@ -31,6 +31,8 @@ from api.views import apply_sponsor
 from api.views import get_sponsor_applications
 from api.views import update_application_status
 from api.views import get_driver_applications
+from api.views import confirm_join_sponsor
+from api.views import cancel_application
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -57,4 +59,6 @@ urlpatterns = [
     path('api/get-sponsor-applications/', get_sponsor_applications, name='get-sponsor-applications'),
     path('api/update-application-status/', update_application_status, name='update-application-status'),
     path('api/get-driver-applications/', get_driver_applications, name='get-driver-applications'),
+    path('api/confirm-join-sponsor/', confirm_join_sponsor, name='confirm-join-sponsor'),
+    path('api/cancel-application/', cancel_application, name='cancel-application'),
 ]

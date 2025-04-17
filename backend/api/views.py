@@ -25,6 +25,7 @@ from .cloudwatch_logs import get_audit_logs
 from .models import Sponsor
 from .models import Application
 from .models import SponsorUser
+from django.db.models import Max
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -451,8 +452,12 @@ def apply_sponsor(request):
         try:
             user = Account.objects.get(account_username=username)
             sponsor = Sponsor.objects.get(pk=sponsor_id)
-            if Application.objects.filter(account_username=user, sponsor=sponsor).exists():
-                return JsonResponse({'message': 'You have already applied to this sponsor.'}, status=201)
+            latest_app = Application.objects.filter(
+                account_username=user,
+                sponsor=sponsor
+            ).order_by('-application_at').first()
+            if latest_app and latest_app.application_status not in ["rejected", "canceled"]:
+                return JsonResponse({'message': 'You have already applied to this sponsor and must wait for a response or cancel the application.'}, status=400)
             application = Application(
                 account_username=user,
                 sponsor=sponsor,
@@ -516,20 +521,64 @@ def update_application_status(request):
 def get_driver_applications(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        username = data.get("username")
+        username = data.get('username')
         try:
-            driver = Account.objects.get(account_username=username)
-            applications = Application.objects.filter(account_username=driver).select_related('sponsor')
-            result = [
-                {
-                    'application_id': app.application_id,
-                    'sponsor_name': app.sponsor.sponsor_name,
-                    'status': app.application_status,
-                    'applied_at': app.application_at.strftime('%Y-%m-%d %H:%M:%S'),
-                }
-                for app in applications
-            ]
-            return JsonResponse(result, safe=False)
+            user = Account.objects.get(account_username=username)
+            latest_app_dates = Application.objects.filter(account_username=user)\
+                .values('sponsor_id')\
+                .annotate(latest_date=Max('application_at'))
+            latest_apps = Application.objects.filter(
+                account_username=user,
+                sponsor_id__in=[entry['sponsor_id'] for entry in latest_app_dates],
+                application_at__in=[entry['latest_date'] for entry in latest_app_dates]
+            ).select_related('sponsor')
+            data = [{
+                'sponsor_name': app.sponsor.sponsor_name,
+                'status': app.application_status,
+                'submitted_at': app.application_at
+            } for app in latest_apps]
+            return JsonResponse(data, safe=False)
         except Account.DoesNotExist:
-            return JsonResponse({'error': 'Driver not found.'}, status=404)
-    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+            return JsonResponse({'error': 'User not found'}, status=404)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+@csrf_exempt
+def confirm_join_sponsor(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            application_id = data.get("application_id")
+            username = data.get("username")
+            account = Account.objects.get(account_username=username)
+            application = Application.objects.get(application_id=application_id, account_username=account)
+            if application.application_status != "accepted":
+                return JsonResponse({"error": "You can only join sponsors from accepted applications."}, status=400)
+            application.application_status = "joined"
+            application.save()
+            return JsonResponse({"message": "You have successfully joined the sponsor!"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def cancel_application(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        sponsor_name = data.get("sponsor_name")
+        username = data.get("username")
+        if not sponsor_name or not username:
+            return JsonResponse({"error": "Sponsor name and username are required"}, status=400)
+        try:
+            user = Account.objects.get(account_username=username)
+            sponsor = Sponsor.objects.get(sponsor_name=sponsor_name)
+            application = Application.objects.filter(account_username=user, sponsor=sponsor).order_by('-application_at').first()
+            if not application:
+                return JsonResponse({"error": "Application not found for this sponsor."}, status=404)
+            application.application_status = "canceled"
+            application.save()
+            return JsonResponse({"message": "Application canceled successfully."}, status=200)
+        except Account.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
+        except Sponsor.DoesNotExist:
+            return JsonResponse({"error": "Sponsor not found"}, status=404)
+    return JsonResponse({"error": "Invalid request method"}, status=400)

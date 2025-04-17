@@ -11,14 +11,6 @@ function Applications() {
     const [error, setError] = useState(null);
     const user = localStorage.getItem("user");
     const [myApplications, setMyApplications] = useState([]);
-    /*const [formData, setFormData] = useState({
-        driverName: "",
-        companyName: "",
-        reason: "",
-        date: "",
-    });*/
-
-    //const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         document.title = "Sponsorship Application";
@@ -52,20 +44,6 @@ function Applications() {
         });
     }, [user]);
 
-    /*const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const currDate = new Date().toLocaleString();
-        const submittedData = { ...formData, date: currDate };
-        console.log("Application Form:", submittedData);
-        setFormData({ driverName: "", companyName: "", reason: "", date: "" });
-        setSuccessMessage("Application submitted succesfully!");
-        setTimeout(() => setSuccessMessage(""), 7000);
-    };*/
-
     const handleMoreInfo = (sponsor_id) => {
         if (selectedSponsor && selectedSponsor.sponsor_id === sponsor_id) {
             setSelectedSponsor(null);
@@ -93,6 +71,7 @@ function Applications() {
             const data = await response.json();
             if (response.ok) {
                 alert(data.message || "Application submitted successfully!");
+                window.location.reload();
             } else {
                 alert(data.error || "An error occurred while submitting the application.");
             }
@@ -101,6 +80,62 @@ function Applications() {
         .catch((error) => {
             alert("Network error. Please try again.");
             console.error("Error:", error);
+        });
+    };
+
+    const handleJoinSponsor = (applicationId) => {
+        fetch("http://localhost:8000/api/confirm-join-sponsor/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ application_id: applicationId, username: user }),
+        })
+        .then(async (res) => {
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || "You’ve joined the sponsor!");
+                setMyApplications(prev =>
+                    prev.map(app =>
+                        app.application_id === applicationId
+                            ? { ...app, status: "joined" }
+                            : app
+                    )
+                );
+            } else {
+                alert(data.error || "Failed to join sponsor.");
+            }
+        })
+        .catch((err) => {
+            console.error("Error joining sponsor:", err);
+            alert("Network error.");
+        });
+    };
+
+    const handleCancelApplication = (sponsorName) => {
+        if (!window.confirm("Are you sure you want to cancel this application?")) return;
+    
+        fetch("http://localhost:8000/api/cancel-application/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sponsor_name: sponsorName, username: user }),
+        })
+        .then(async (res) => {
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || "Application canceled.");
+                setMyApplications(prev =>
+                    prev.map(app =>
+                        app.sponsor_name === sponsorName && app.status !== "canceled"
+                            ? { ...app, status: "canceled" }
+                            : app
+                    )
+                );
+            } else {
+                alert(data.error || "Failed to cancel.");
+            }
+        })
+        .catch((err) => {
+            console.error("Error canceling application:", err);
+            alert("Network error.");
         });
     };
 
@@ -266,6 +301,41 @@ function Applications() {
                                                             : "#dc3545",
                                                     fontWeight: "600"
                                                 }}>{app.status}</span></p>
+                                                {(app.status === "accepted" || app.status === "pending") && (
+                                                    <div style={{ marginTop: "10px" }}>
+                                                        {app.status === "accepted" && (
+                                                            <button
+                                                                onClick={() => handleJoinSponsor(app.application_id)}
+                                                                style={{
+                                                                    padding: "8px 16px",
+                                                                    backgroundColor: "#007bff",
+                                                                    color: "white",
+                                                                    border: "none",
+                                                                    borderRadius: "6px",
+                                                                    cursor: "pointer",
+                                                                    fontWeight: "500",
+                                                                    marginRight: "10px"
+                                                                }}
+                                                            >
+                                                                Join Sponsor
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={() => handleCancelApplication(app.sponsor_name)}
+                                                            style={{
+                                                                padding: "8px 16px",
+                                                                backgroundColor: "#dc3545",
+                                                                color: "white",
+                                                                border: "none",
+                                                                borderRadius: "6px",
+                                                                cursor: "pointer",
+                                                                fontWeight: "500"
+                                                            }}
+                                                        >
+                                                            Cancel Application
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </li>
                                         ))}
                                     </ul>

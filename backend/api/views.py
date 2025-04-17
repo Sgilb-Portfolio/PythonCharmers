@@ -582,3 +582,65 @@ def cancel_application(request):
         except Sponsor.DoesNotExist:
             return JsonResponse({"error": "Sponsor not found"}, status=404)
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+@csrf_exempt
+def get_sponsor_details_by_account(request):
+    if request.method == "GET":
+        try:
+            account_username = request.GET.get("username")
+            account = Account.objects.get(account_username=account_username)
+            sponsoruser = SponsorUser.objects.get(account=account)
+            sponsor = Sponsor.objects.get(sponsor_id=sponsoruser.sponsor.sponsor_id)
+            data = {
+                "sponsor_id": sponsor.sponsor_id,
+                "sponsor_name": sponsor.sponsor_name,
+                "sponsor_rules": sponsor.sponsor_rules,
+                "sponsor_pt_amt": str(sponsor.sponsor_pt_amt),
+            }
+            return JsonResponse(data)
+        except Account.DoesNotExist:
+            return JsonResponse({"error": "Account not found"}, status=404)
+        except Sponsor.DoesNotExist:
+            return JsonResponse({"error": "Sponsor not found"}, status=404)
+        except SponsorUser.DoesNotExist:
+            return JsonResponse({"error": "SponsorUser not found for this account"}, status=404)
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+@csrf_exempt
+def update_sponsor_rules(request):
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            rules = data.get("rules", "").strip()
+
+            if not username:
+                return JsonResponse({"error": "Username is required."}, status=400)
+            if not rules:
+                return JsonResponse({"error": "Rules are required."}, status=400)
+
+            # Get account by username
+            account = Account.objects.get(account_username=username)
+
+            # Get the sponsor_user entry
+            sponsor_user = SponsorUser.objects.get(account=account)
+
+            # Get the sponsor via sponsor_user.sponsor (it's a ForeignKey)
+            sponsor = Sponsor.objects.get(sponsor_id=sponsor_user.sponsor.sponsor_id)
+
+            # Update and save the rules
+            sponsor.sponsor_rules = rules
+            sponsor.save()
+
+            return JsonResponse({"message": "Rules updated successfully."}, status=200)
+
+        except Account.DoesNotExist:
+            return JsonResponse({"error": "Account not found."}, status=404)
+        except SponsorUser.DoesNotExist:
+            return JsonResponse({"error": "Sponsor association not found."}, status=404)
+        except Sponsor.DoesNotExist:
+            return JsonResponse({"error": "Sponsor not found."}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)

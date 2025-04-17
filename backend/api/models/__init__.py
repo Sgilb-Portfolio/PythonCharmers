@@ -6,3 +6,5 @@ from .points import Points
 from .pointslog import PointsLog
 from .failedloginattempts import FailedLoginAttempts
 from .prof import Prof
+from .application import Application
+from .sponsoruser import SponsorUser

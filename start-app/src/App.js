@@ -17,6 +17,8 @@ import Purchase from "./pages/Purchase";
 import RoleProtection from "./components/RoleProtection";
 import Protection from "./components/Protection";
 import AuditLogs from "./pages/AuditLogs";
+import SponsorApplications from "./pages/SponsorApplications";
+import SponsorEdit from "./pages/SponsorEdit";
 
 function App() {
   const navigate = useNavigate();
@@ -71,6 +73,8 @@ function App() {
       <Route path="/cart" element={<Protection><Cart /></Protection>} />
       <Route path="/purchase" element={<Protection><Purchase /></Protection>} />
       <Route path="/audit-logs" element={<RoleProtection allowedRoles={["admin"]}><AuditLogs /></RoleProtection>}/>
+      <Route path="/sponsor-applications" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorApplications /></RoleProtection>} />
+      <Route path="/sponsor-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorEdit /></RoleProtection>} />
     </Routes>
   );
 }

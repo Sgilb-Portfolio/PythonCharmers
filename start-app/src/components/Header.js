@@ -29,8 +29,8 @@ const Header = () => {
 
     const fetchDriverPoints = async (username) => {
         try {
-            // const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
-            const response = await fetch(`http://44.202.51.190:8000/api/get-driver-points/${username}`);
+            const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
+            //const response = await fetch(`http://44.202.51.190:8000/api/get-driver-points/${username}`);
             if (response.ok) {
                 const data = await response.json();
                 setDriverPoints(data.points);
@@ -107,7 +107,7 @@ const Header = () => {
                     transition: "color 0.2s"
                 }}>About</Link>
 
-                {idToken && (
+                {idToken && (userRole === "driver") && (
                     <Link to="/applications" style={{
                         margin: "0 10px",
                         textDecoration: "none",
@@ -125,6 +125,26 @@ const Header = () => {
                         fontWeight: "500",
                         transition: "color 0.2s"
                     }}>Manage Points</Link>
+                )}
+
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/sponsor-applications" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Applications</Link>
+                )}
+
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/sponsor-edit" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Sponsor Info</Link>
                 )}
 
                 {idToken && (

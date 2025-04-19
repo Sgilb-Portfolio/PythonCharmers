@@ -279,6 +279,15 @@ const Header = () => {
                                     fontWeight: "500"
                                 }}>Profile</Link>
                                 <hr style={{ margin: "5px 0", border: "none", borderTop: "1px solid #eee" }} />
+                                <Link to="/my-sponsors" style={{
+                                    display: "block",
+                                    padding: "12px 15px",
+                                    textDecoration: "none",
+                                    color: "#333",
+                                    borderRadius: "5px",
+                                    transition: "background-color 0.2s",
+                                    fontWeight: "500"
+                                }}>My Sponsors</Link>
                                 <button onClick={handleLogout} style={{
                                     width: "100%",
                                     background: "none",

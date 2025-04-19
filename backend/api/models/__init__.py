@@ -8,3 +8,4 @@ from .failedloginattempts import FailedLoginAttempts
 from .prof import Prof
 from .application import Application
 from .sponsoruser import SponsorUser
+from .driversponsor import DriverSponsor

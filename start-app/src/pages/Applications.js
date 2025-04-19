@@ -83,11 +83,11 @@ function Applications() {
         });
     };
 
-    const handleJoinSponsor = (applicationId) => {
+    const handleJoinSponsor = (sponsorName) => {
         fetch("http://localhost:8000/api/confirm-join-sponsor/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ application_id: applicationId, username: user }),
+            body: JSON.stringify({ sponsor_name: sponsorName, username: user }),
         })
         .then(async (res) => {
             const data = await res.json();
@@ -95,7 +95,7 @@ function Applications() {
                 alert(data.message || "You’ve joined the sponsor!");
                 setMyApplications(prev =>
                     prev.map(app =>
-                        app.application_id === applicationId
+                        app.sponsor_name === sponsorName
                             ? { ...app, status: "joined" }
                             : app
                     )
@@ -305,7 +305,7 @@ function Applications() {
                                                     <div style={{ marginTop: "10px" }}>
                                                         {app.status === "accepted" && (
                                                             <button
-                                                                onClick={() => handleJoinSponsor(app.application_id)}
+                                                                onClick={() => handleJoinSponsor(app.sponsor_name)}
                                                                 style={{
                                                                     padding: "8px 16px",
                                                                     backgroundColor: "#007bff",

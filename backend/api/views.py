@@ -26,6 +26,7 @@ from .models import Sponsor
 from .models import Application
 from .models import SponsorUser
 from django.db.models import Max
+from .models import DriverSponsor
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -545,12 +546,15 @@ def get_driver_applications(request):
 @csrf_exempt
 def confirm_join_sponsor(request):
     if request.method == "POST":
+        data = json.loads(request.body)
+        sponsor_name = data.get("sponsor_name")
+        username = data.get("username")
+        if not sponsor_name or not username:
+            return JsonResponse({"error": "Sponsor name and username are required"}, status=400)
         try:
-            data = json.loads(request.body)
-            application_id = data.get("application_id")
-            username = data.get("username")
-            account = Account.objects.get(account_username=username)
-            application = Application.objects.get(application_id=application_id, account_username=account)
+            user = Account.objects.get(account_username=username)
+            sponsor = Sponsor.objects.get(sponsor_name=sponsor_name)
+            application = Application.objects.filter(account_username=user, sponsor=sponsor).order_by('-application_at').first()
             if application.application_status != "accepted":
                 return JsonResponse({"error": "You can only join sponsors from accepted applications."}, status=400)
             application.application_status = "joined"
@@ -613,27 +617,16 @@ def update_sponsor_rules(request):
             data = json.loads(request.body)
             username = data.get("username")
             rules = data.get("rules", "").strip()
-
             if not username:
                 return JsonResponse({"error": "Username is required."}, status=400)
             if not rules:
                 return JsonResponse({"error": "Rules are required."}, status=400)
-
-            # Get account by username
             account = Account.objects.get(account_username=username)
-
-            # Get the sponsor_user entry
             sponsor_user = SponsorUser.objects.get(account=account)
-
-            # Get the sponsor via sponsor_user.sponsor (it's a ForeignKey)
             sponsor = Sponsor.objects.get(sponsor_id=sponsor_user.sponsor.sponsor_id)
-
-            # Update and save the rules
             sponsor.sponsor_rules = rules
             sponsor.save()
-
             return JsonResponse({"message": "Rules updated successfully."}, status=200)
-
         except Account.DoesNotExist:
             return JsonResponse({"error": "Account not found."}, status=404)
         except SponsorUser.DoesNotExist:
@@ -642,5 +635,26 @@ def update_sponsor_rules(request):
             return JsonResponse({"error": "Sponsor not found."}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
-
     return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def get_driver_sponsors(request):
+    if request.method == "GET":
+        username = request.GET.get("username")
+        try:
+            account = Account.objects.get(account_username=username)
+            driver_sponsors = DriverSponsor.objects.filter(account=account).select_related("sponsor")
+            data = []
+            for ds in driver_sponsors:
+                sponsor = ds.sponsor
+                data.append({
+                    "sponsor_id": sponsor.sponsor_id,
+                    "sponsor_name": sponsor.sponsor_name,
+                    "sponsor_rules": sponsor.sponsor_rules,
+                    "sponsor_pt_amt": str(sponsor.sponsor_pt_amt),
+                    "joined_at": ds.driver_sponsor_joined_at.strftime("%Y-%m-%d %H:%M:%S"),
+                })
+            return JsonResponse(data, safe=False)
+        except Account.DoesNotExist:
+            return JsonResponse({"error": "Account not found"}, status=404)
+    return JsonResponse({"error": "Invalid request method"}, status=400)

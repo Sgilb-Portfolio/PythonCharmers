@@ -19,6 +19,7 @@ import Protection from "./components/Protection";
 import AuditLogs from "./pages/AuditLogs";
 import SponsorApplications from "./pages/SponsorApplications";
 import SponsorEdit from "./pages/SponsorEdit";
+import DriverSponsors from "./pages/DriverSponsors";
 
 function App() {
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ function App() {
       <Route path="/audit-logs" element={<RoleProtection allowedRoles={["admin"]}><AuditLogs /></RoleProtection>}/>
       <Route path="/sponsor-applications" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorApplications /></RoleProtection>} />
       <Route path="/sponsor-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorEdit /></RoleProtection>} />
+      <Route path="/my-sponsors" element={<Protection><DriverSponsors /></Protection>} />
     </Routes>
   );
 }

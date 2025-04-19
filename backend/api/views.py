@@ -698,3 +698,28 @@ def sponsor_catalog_add(request):
         return JsonResponse({"message": "Item successfully added to sponsor catalog."}, status=201)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
+@csrf_exempt
+def get_sponsor_catalog_items(request, sponsor_id):
+    if request.method == "GET":
+        token = request.headers.get('Authorization')
+        if not token:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        try:
+            sponsor_items = SponsorCatalogItem.objects.filter(sponsor__sponsor_id=sponsor_id)
+            items = []
+            for item in sponsor_items:
+                catalog = item.catalog_item
+                items.append({
+                    "item_id": catalog.catalog_item_id,
+                    "name": catalog.catalog_item_name,
+                    "creator": catalog.catalog_item_creator,
+                    "type": catalog.catalog_item_type,
+                    "price": str(catalog.catalog_item_price),
+                    "availability": "available" if catalog.catalog_item_availability else "unavailable",
+                    "image": catalog.catalog_item_image_url,
+                })
+            return JsonResponse({"items": items}, safe=False)
+        except SponsorCatalogItem.DoesNotExist:
+            return JsonResponse({"error": "Sponsor not found."}, status=404)
+    return JsonResponse({"error": "Invalid request method."}, status=400)

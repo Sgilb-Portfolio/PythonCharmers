@@ -37,6 +37,7 @@ from api.views import get_sponsor_details_by_account
 from api.views import update_sponsor_rules
 from api.views import get_driver_sponsors
 from api.views import sponsor_catalog_add
+from api.views import get_sponsor_catalog_items
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -69,4 +70,5 @@ urlpatterns = [
     path("api/update-sponsor-rules/", update_sponsor_rules, name="update-sponsor-rules"),
     path("api/get-driver-sponsors/", get_driver_sponsors, name="get-driver-sponsors"),
     path("api/sponsor-catalog-add/", sponsor_catalog_add, name="sponsor-catalog-add"),
+    path('api/get-sponsor-catalog-items/<int:sponsor_id>/', get_sponsor_catalog_items, name='get-sponsor-catalog-items'),
 ]

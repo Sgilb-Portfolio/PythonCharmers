@@ -27,6 +27,8 @@ from .models import Application
 from .models import SponsorUser
 from django.db.models import Max
 from .models import DriverSponsor
+from .models import CatalogItem
+from .models import SponsorCatalogItem
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -658,3 +660,41 @@ def get_driver_sponsors(request):
         except Account.DoesNotExist:
             return JsonResponse({"error": "Account not found"}, status=404)
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+@csrf_exempt
+def sponsor_catalog_add(request):
+    try:
+        data = json.loads(request.body)
+        username = data.get("username")
+        account = Account.objects.get(account_username=username)
+        sponsor_user = SponsorUser.objects.get(account=account)
+        sponsor = Sponsor.objects.get(sponsor_id=sponsor_user.sponsor.sponsor_id)
+        item_name = data.get("name")
+        item_creator = data.get("creator")
+        item_type = data.get("type")
+        item_price = data.get("price")
+        item_availability = data.get("availability")
+        item_image_url = data.get("image_url")
+        if not all([item_name, item_creator, item_price, item_availability, item_image_url]):
+            return JsonResponse({"error": "All fields are required."}, status=400)
+        catalog_item, created = CatalogItem.objects.get_or_create(
+            catalog_item_name=item_name,
+            catalog_item_creator=item_creator,
+            catalog_item_type=item_type,
+            catalog_item_price=item_price,
+            catalog_item_availability=item_availability,
+            catalog_item_image_url=item_image_url
+        )
+        existing_link = SponsorCatalogItem.objects.filter(
+            sponsor_id=sponsor.sponsor_id,
+            catalog_item_id=catalog_item.catalog_item_id
+        ).first()
+        if existing_link:
+            return JsonResponse({"message": "Item already exists in sponsor's catalog."}, status=200)
+        SponsorCatalogItem.objects.create(
+            sponsor=sponsor,
+            catalog_item=catalog_item
+        )
+        return JsonResponse({"message": "Item successfully added to sponsor catalog."}, status=201)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

@@ -147,8 +147,18 @@ const Header = () => {
                     }}>Sponsor Info</Link>
                 )}
 
-                {idToken && (
+                {(userRole === "driver") && (
                     <Link to="/catalog" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Catalog</Link>
+                )}
+
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/catalog-edit" style={{
                         margin: "0 10px",
                         textDecoration: "none",
                         color: "#ffffff",

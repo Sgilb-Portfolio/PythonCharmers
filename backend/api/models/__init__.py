@@ -9,3 +9,5 @@ from .prof import Prof
 from .application import Application
 from .sponsoruser import SponsorUser
 from .driversponsor import DriverSponsor
+from .catologitem import CatalogItem
+from .sponsorcatalogitem import SponsorCatalogItem

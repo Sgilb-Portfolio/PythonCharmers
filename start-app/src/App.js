@@ -20,6 +20,7 @@ import AuditLogs from "./pages/AuditLogs";
 import SponsorApplications from "./pages/SponsorApplications";
 import SponsorEdit from "./pages/SponsorEdit";
 import DriverSponsors from "./pages/DriverSponsors";
+import CatalogEdit from "./pages/CatalogEdit";
 
 function App() {
   const navigate = useNavigate();
@@ -77,6 +78,7 @@ function App() {
       <Route path="/sponsor-applications" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorApplications /></RoleProtection>} />
       <Route path="/sponsor-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorEdit /></RoleProtection>} />
       <Route path="/my-sponsors" element={<Protection><DriverSponsors /></Protection>} />
+      <Route path="/catalog-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><CatalogEdit /></RoleProtection>} />
     </Routes>
   );
 }

@@ -4,10 +4,18 @@ import { FaUserCircle, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 
 const Header = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [pointsDropdownOpen, setPointsDropdownOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
 
-    const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+        setPointsDropdownOpen(false);
+    };
+    const togglePointsDropdown = () => {
+        setPointsDropdownOpen(!pointsDropdownOpen);
+        setDropdownOpen(false);
+      };
     const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
     const idToken = localStorage.getItem("IdToken") || null;
@@ -18,6 +26,7 @@ const Header = () => {
     const isAdmin = userRole === "admin";
     const isDriver = userRole === "driver";
     const [driverPoints, setDriverPoints] = useState(null);
+    const [sponsorPoints, setSponsorPoints] = useState([]);
     const username = localStorage.getItem("user");
 
     useEffect(() => {
@@ -30,10 +39,9 @@ const Header = () => {
     const fetchDriverPoints = async (username) => {
         try {
             const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
-            //const response = await fetch(`http://44.202.51.190:8000/api/get-driver-points/${username}`);
             if (response.ok) {
                 const data = await response.json();
-                setDriverPoints(data.points);
+                setSponsorPoints(data.sponsor_points || []);
             }
         } catch (error) {
             console.error("Error fetching driver points:", error);
@@ -197,21 +205,50 @@ const Header = () => {
                 justifyContent: "flex-end"
             }}>
                 {/* Display driver points if user is a driver - with cart styling */}
-                {idToken && isDriver && driverPoints !== null && (
-                    <Link to="/profile" style={{
-                        textDecoration: "none",
-                        color: "#ffffff",
-                        fontWeight: "500",
-                        padding: "8px 15px",
-                        borderRadius: "20px",
-                        border: "1px solid #ffffff",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        transition: "all 0.2s"
-                    }}>
-                        <span>Points: {driverPoints}</span>
-                    </Link>
+                {idToken && isDriver && sponsorPoints.length > 0 && (
+                    <div style={{ position: "relative" }}>
+                        <div
+                            onClick={() => togglePointsDropdown(!dropdownOpen)}
+                            style={{
+                                cursor: "pointer",
+                                color: "#ffffff",
+                                fontWeight: "500",
+                                padding: "8px 15px",
+                                borderRadius: "20px",
+                                border: "1px solid #ffffff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px"
+                            }}
+                        >
+                            <span>Points</span>
+                            <span>▾</span>
+                        </div>
+                        {pointsDropdownOpen && (
+                            <div style={{
+                                position: "absolute",
+                                top: "45px",
+                                right: 0,
+                                backgroundColor: "#ffffff",
+                                boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+                                borderRadius: "8px",
+                                padding: "10px",
+                                zIndex: 101,
+                                minWidth: "200px"
+                            }}>
+                                {sponsorPoints.map((s, idx) => (
+                                    <div key={idx} style={{
+                                        padding: "8px 10px",
+                                        borderBottom: idx !== sponsorPoints.length - 1 ? "1px solid #eee" : "none",
+                                        color: "#333",
+                                        fontWeight: "500"
+                                    }}>
+                                        {s.sponsor_name}: {s.points}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 )}
                 
                 {idToken && (

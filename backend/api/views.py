@@ -405,26 +405,36 @@ def audit_logs_view(request):
 @csrf_exempt
 def get_driver_points_by_username(request, username):
     """
-    Endpoint to fetch points for a specific driver by username.
-    
-    Usage: GET /api/get-driver-points/<username>
+    GET /api/get-driver-points/<username>
+    Returns a list of point records for a driver grouped by sponsor.
     """
     if request.method != "GET":
         return JsonResponse({"error": "Method not allowed"}, status=405)
-        
+
     try:
-        driver = Points.objects.get(driver_username=username)
+        point_entries = Points.objects.filter(driver_username=username).select_related("sponsor")
+
+        if not point_entries.exists():
+            return JsonResponse({
+                "success": False,
+                "error": "Driver not found"
+            }, status=404)
+
+        sponsor_points = [
+            {
+                "sponsor_id": entry.sponsor.sponsor_id,
+                "sponsor_name": entry.sponsor.sponsor_name,
+                "points": entry.driver_points
+            }
+            for entry in point_entries
+        ]
+
         return JsonResponse({
             "success": True,
-            "points": driver.driver_points
+            "sponsor_points": sponsor_points
         })
-    except Points.DoesNotExist:
-        return JsonResponse({
-            "success": False,
-            "error": "Driver not found"
-        }, status=404)
     except Exception as e:
-        print(f"Error fetching points for driver {username}: {str(e)}")
+        print(f"Error fetching driver points: {str(e)}")
         return JsonResponse({
             "success": False,
             "error": "Internal server error"

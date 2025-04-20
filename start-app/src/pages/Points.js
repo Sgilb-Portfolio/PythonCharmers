@@ -47,10 +47,10 @@ function Points() {
         fetchDrivers();
     }, []);
 
-    const fetchDrivers = async () => {
+    const fetchDrivers = async () => { 
         try {
-            //const response = await fetch("http://44.202.51.190:8000/api/get-points/");
-            const response = await fetch(`http://localhost:8000/api/get-points/?username=${user}`);
+            //const response = await fetch(`http://localhost:8000/api/get-points/?username=${user}`);
+            const response = await fetch(`http://44.202.51.190:8000/api/get-points/?username=${user}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch data");
             }
@@ -141,8 +141,8 @@ function Points() {
             const currentDriver = drivers.find(d => d.driver_username === username);
             const previousPoints = currentDriver ? currentDriver.driver_points : 0;
             
-            //const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
-            const response = await fetch("http://localhost:8000/api/update-points/", {
+            const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
+            //const response = await fetch("http://localhost:8000/api/update-points/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -11,9 +11,10 @@ function SponsorEdit() {
     const username = localStorage.getItem("user");
 
     useEffect(() => {
-        const fetchRules = async () => {
+        const fetchRules = async () => { 
             try {
-                const response = await fetch(`http://localhost:8000/api/get-sponsor-details-by-account/?username=${username}`);
+                //const response = await fetch(`http://localhost:8000/api/get-sponsor-details-by-account/?username=${username}`);
+                const response = await fetch(`http://44.202.51.190:8000/api/get-sponsor-details-by-account/?username=${username}`);
                 if (response.ok) {
                     const data = await response.json();
                     setRules(data.sponsor_rules || "");
@@ -34,7 +35,8 @@ function SponsorEdit() {
     const handleSaveRules = async () => {
         const username = localStorage.getItem("user");
         try {
-            const response = await fetch(`http://localhost:8000/api/update-sponsor-rules/`, {
+            //const response = await fetch(`http://localhost:8000/api/update-sponsor-rules/`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/update-sponsor-rules/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

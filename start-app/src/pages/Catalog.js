@@ -33,12 +33,13 @@ function Catalog() {
         const user = localStorage.getItem("user");
     
         if (!token || !user) {
-            alert("You must be logged in to view sponsor catalogs.");
+            alert("You must be logged in to view sponsor catalogs."); 
             return;
         }
     
         try {
-            const response = await fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`, {
+            //const response = await fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/get-driver-sponsors/?username=${user}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 },
@@ -68,7 +69,8 @@ function Catalog() {
         setLoading(true);
 
         try {
-            const response = await fetch(`http://localhost:8000/api/get-sponsor-catalog-items/${catalogId}/`, {
+            //const response = await fetch(`http://localhost:8000/api/get-sponsor-catalog-items/${catalogId}/`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/get-sponsor-catalog-items/${catalogId}/`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("IdToken")}`,
                 },
@@ -134,7 +136,8 @@ function Catalog() {
         };
     
         try {
-            const response = await fetch("http://localhost:8000/api/add-to-cart/", {
+            //const response = await fetch("http://localhost:8000/api/add-to-cart/", {
+            const response = await fetch("http://44.202.51.190:8000/api/add-to-cart/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

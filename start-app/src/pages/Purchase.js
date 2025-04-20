@@ -22,8 +22,9 @@ function Purchase() {
 
     const fetchSponsors = async () => {
         try {
-            const token = localStorage.getItem("IdToken");
-            const response = await fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`, {
+            const token = localStorage.getItem("IdToken"); 
+            //const response = await fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/get-driver-sponsors/?username=${user}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 },
@@ -43,7 +44,8 @@ function Purchase() {
 
     const fetchCartItems = async (sponsorId) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/cart/${user}?sponsor_id=${sponsorId}`);
+            //const response = await fetch(`http://localhost:8000/api/cart/${user}?sponsor_id=${sponsorId}`);
+            const response = await fetch(`http://44.202.51.190:8000/api/cart/${user}?sponsor_id=${sponsorId}`);
             const data = await response.json();
             if (response.ok) {
                 setCart(data.cart);
@@ -98,7 +100,8 @@ function Purchase() {
         };
     
         try {
-            const response = await fetch(`http://localhost:8000/api/complete-purchase/`, {
+            //const response = await fetch(`http://localhost:8000/api/complete-purchase/`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/complete-purchase/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

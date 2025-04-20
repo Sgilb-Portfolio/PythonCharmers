@@ -17,7 +17,8 @@ function Cart() {
     const fetchSponsors = async () => {
         try {
             const token = localStorage.getItem("IdToken");
-            const response = await fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`, {
+            //const response = await fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/get-driver-sponsors/?username=${user}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 },
@@ -38,7 +39,8 @@ function Cart() {
     
     const fetchCartItems = async (sponsorId) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/cart/${user}?sponsor_id=${sponsorId}`);
+            //const response = await fetch(`http://localhost:8000/api/cart/${user}?sponsor_id=${sponsorId}`);
+            const response = await fetch(`http://44.202.51.190:8000/api/cart/${user}?sponsor_id=${sponsorId}`);
             const data = await response.json();
             if (response.ok) {
                 setCart(data.cart);
@@ -64,7 +66,8 @@ function Cart() {
 
     const handleRemoveItem = async (itemId) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/cart/${itemId}/remove/`, {
+            //const response = await fetch(`http://localhost:8000/api/cart/${itemId}/remove/`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/cart/${itemId}/remove/`, {
                 method: "DELETE",
             });
 
@@ -80,7 +83,8 @@ function Cart() {
 
     const handleIncreaseQuantity = async (itemId) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/cart/${itemId}/increase/`, {
+            //const response = await fetch(`http://localhost:8000/api/cart/${itemId}/increase/`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/cart/${itemId}/increase/`, {
                 method: "PATCH",
             });
 
@@ -97,7 +101,8 @@ function Cart() {
 
     const handleDecreaseQuantity = async (itemId) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/cart/${itemId}/decrease/`, {
+            //const response = await fetch(`http://localhost:8000/api/cart/${itemId}/decrease/`, {
+            const response = await fetch(`http://44.202.51.190:8000/api/cart/${itemId}/decrease/`, {
                 method: "PATCH",
             });
 

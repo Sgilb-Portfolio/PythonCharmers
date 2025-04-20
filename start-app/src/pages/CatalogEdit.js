@@ -27,8 +27,8 @@ function CatalogEdit() {
 
     const fetchData = () => {
         setLoading(true);
-        //fetch(`http://44.202.51.190:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
-        fetch(`http://localhost:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
+        fetch(`http://44.202.51.190:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
+        //fetch(`http://localhost:8000/api/itunes-search/?term=${searchTerm}&media=${mediaType}&limit=${itemsPerPage}`)
         .then(response => response.json())
             .then(data => {
                 if (data.results) {
@@ -76,7 +76,8 @@ function CatalogEdit() {
         const availability = item.availability && item.availability.toLowerCase() === "available" ? true : false;
     
         try {
-            const response = await fetch("http://localhost:8000/api/sponsor-catalog-add/", {
+            //const response = await fetch("http://localhost:8000/api/sponsor-catalog-add/", {
+            const response = await fetch("http://44.202.51.190:8000/api/sponsor-catalog-add/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

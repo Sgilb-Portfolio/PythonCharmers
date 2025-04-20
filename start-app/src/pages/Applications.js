@@ -15,7 +15,8 @@ function Applications() {
     useEffect(() => {
         document.title = "Sponsorship Application";
         setLoading(true);
-        fetch("http://localhost:8000/api/get-sponsors/")
+        //fetch("http://localhost:8000/api/get-sponsors/")
+        fetch("http://44.202.51.190:8000/api/get-sponsors/")
             .then((res) => res.json())
             .then((data) => {
                 setSponsors(data);
@@ -29,8 +30,8 @@ function Applications() {
 
     useEffect(() => {
         if (!user) return;
-    
-        fetch("http://localhost:8000/api/get-driver-applications/", {
+        //fetch("http://localhost:8000/api/get-driver-applications/", {
+        fetch("http://44.202.51.190:8000/api/get-driver-applications/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: user }),
@@ -48,7 +49,8 @@ function Applications() {
         if (selectedSponsor && selectedSponsor.sponsor_id === sponsor_id) {
             setSelectedSponsor(null);
         } else {
-            fetch(`http://localhost:8000/api/get-sponsor-details/${sponsor_id}/`)
+            //fetch(`http://localhost:8000/api/get-sponsor-details/${sponsor_id}/`)
+            fetch(`http://44.202.51.190:8000/api/get-sponsor-details/${sponsor_id}/`)
                 .then((res) => res.json())
                 .then((data) => setSelectedSponsor(data));
         }
@@ -60,7 +62,8 @@ function Applications() {
             sponsor_id: sponsor_id,
             status: "pending",
         };
-        fetch("http://localhost:8000/api/apply-sponsor/", {
+        //fetch("http://localhost:8000/api/apply-sponsor/", {
+        fetch("http://44.202.51.190:8000/api/apply-sponsor/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -84,7 +87,8 @@ function Applications() {
     };
 
     const handleJoinSponsor = (sponsorName) => {
-        fetch("http://localhost:8000/api/confirm-join-sponsor/", {
+        //fetch("http://localhost:8000/api/confirm-join-sponsor/", {
+        fetch("http://44.202.51.190:8000/api/confirm-join-sponsor/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ sponsor_name: sponsorName, username: user }),
@@ -112,8 +116,8 @@ function Applications() {
 
     const handleCancelApplication = (sponsorName) => {
         if (!window.confirm("Are you sure you want to cancel this application?")) return;
-    
-        fetch("http://localhost:8000/api/cancel-application/", {
+        //fetch("http://localhost:8000/api/cancel-application/", {
+        fetch("http://44.202.51.190:8000/api/cancel-application/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ sponsor_name: sponsorName, username: user }),

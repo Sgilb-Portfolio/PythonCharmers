@@ -10,8 +10,9 @@ function SponsorApplications() {
     const username = localStorage.getItem("user");
 
     useEffect(() => {
-        document.title = "Sponsor Applications";
-        fetch("http://localhost:8000/api/get-sponsor-applications/", {
+        document.title = "Sponsor Applications"; 
+        //fetch("http://localhost:8000/api/get-sponsor-applications/", {
+        fetch("http://44.202.51.190:8000/api/get-sponsor-applications/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: username })
@@ -28,7 +29,8 @@ function SponsorApplications() {
     }, [username]);
 
     const updateStatus = (appId, newStatus) => {
-        fetch(`http://localhost:8000/api/update-application-status/`, {
+        //fetch(`http://localhost:8000/api/update-application-status/`, {
+        fetch(`http://44.202.51.190:8000/api/update-application-status/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ application_id: appId, status: newStatus }),

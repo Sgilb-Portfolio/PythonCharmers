@@ -27,8 +27,8 @@ function ResetPassword() {
         }
 
         try {
-            //const response = await fetch("http://44.202.51.190:8000/api/reset-password/", {
-            const response = await fetch("http://localhost:8000/api/reset-password/", {
+            const response = await fetch("http://44.202.51.190:8000/api/reset-password/", {
+            //const response = await fetch("http://localhost:8000/api/reset-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

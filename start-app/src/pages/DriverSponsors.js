@@ -10,8 +10,9 @@ function DriverSponsors() {
     const user = localStorage.getItem("user");
 
     useEffect(() => {
-        document.title = "My Sponsors";
-        fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`)
+        document.title = "My Sponsors"; 
+        //fetch(`http://localhost:8000/api/get-driver-sponsors/?username=${user}`)
+        fetch(`http://44.202.51.190:8000/api/get-driver-sponsors/?username=${user}`)
             .then((res) => res.json())
             .then((data) => {
                 setSponsors(data);

@@ -29,6 +29,7 @@ from django.db.models import Max
 from .models import DriverSponsor
 from .models import CatalogItem
 from .models import SponsorCatalogItem
+from .models import CartItem
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -722,4 +723,127 @@ def get_sponsor_catalog_items(request, sponsor_id):
             return JsonResponse({"items": items}, safe=False)
         except SponsorCatalogItem.DoesNotExist:
             return JsonResponse({"error": "Sponsor not found."}, status=404)
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def add_to_cart(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            account_username = data.get("account_username")
+            sponsor_id = data.get("sponsor_id")
+            catalog_item_id = data.get("catalog_item_id")
+            cart_item_quantity = data.get("cart_item_quantity", 1)
+            if not all([account_username, sponsor_id, catalog_item_id]):
+                return JsonResponse({"error": "Missing required fields."}, status=400)
+            try:
+                account = Account.objects.get(account_username=account_username)
+            except Account.DoesNotExist:
+                return JsonResponse({"error": "Account not found."}, status=404)
+            try:
+                catalog_item = CatalogItem.objects.get(catalog_item_id=catalog_item_id)
+            except CatalogItem.DoesNotExist:
+                return JsonResponse({"error": "Catalog item not found."}, status=404)
+            existing_cart_item = CartItem.objects.filter(
+                account=account,
+                sponsor_id=sponsor_id,
+                catalog_item=catalog_item
+            ).first()
+            if existing_cart_item:
+                existing_cart_item.cart_item_quantity += cart_item_quantity
+                existing_cart_item.save()
+                return JsonResponse({"message": "Cart item quantity updated."}, status=200)
+            else:
+                cart_item = CartItem.objects.create(
+                    account=account,
+                    sponsor_id=sponsor_id,
+                    catalog_item=catalog_item,
+                    cart_item_quantity=cart_item_quantity
+                )
+                return JsonResponse({"message": "Item added to cart."}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def get_cart_items(request, username):
+    if request.method == "GET":
+        try:
+            cart_items = CartItem.objects.filter(account__account_username=username)
+            items = []
+            for item in cart_items:
+                catalog = item.catalog_item
+                items.append({
+                    "cart_item_id": item.cart_item_id,
+                    "name": catalog.catalog_item_name,
+                    "creator": catalog.catalog_item_creator,
+                    "type": catalog.catalog_item_type,
+                    "price": str(catalog.catalog_item_price),
+                    "availability": "available" if catalog.catalog_item_availability else "unavailable",
+                    "image": catalog.catalog_item_image_url,
+                    "quantity": item.cart_item_quantity
+                })
+            return JsonResponse({"cart": items})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def remove_cart_item(request, item_id):
+    if request.method == "DELETE":
+        try:
+            item = CartItem.objects.get(cart_item_id=item_id)
+            item.delete()
+            return JsonResponse({"message": "Item removed from cart."})
+        except CartItem.DoesNotExist:
+            return JsonResponse({"error": "Item not found."}, status=404)
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def increase_cart_quantity(request, item_id):
+    if request.method == "PATCH":
+        try:
+            item = CartItem.objects.get(cart_item_id=item_id)
+            item.cart_item_quantity += 1
+            item.save()
+            updated_item = {
+                "cart_item_id": item.cart_item_id,
+                "name": item.catalog_item.catalog_item_name,
+                "creator": item.catalog_item.catalog_item_creator,
+                "type": item.catalog_item.catalog_item_type,
+                "price": str(item.catalog_item.catalog_item_price),
+                "availability": "available" if item.catalog_item.catalog_item_availability else "unavailable",
+                "image": item.catalog_item.catalog_item_image_url,
+                "quantity": item.cart_item_quantity
+            }
+            return JsonResponse(updated_item)
+        except CartItem.DoesNotExist:
+            return JsonResponse({"error": "Item not found."}, status=404)
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def decrease_cart_quantity(request, item_id):
+    if request.method == "PATCH":
+        try:
+            item = CartItem.objects.get(cart_item_id=item_id)
+            if item.cart_item_quantity > 1:
+                item.cart_item_quantity -= 1
+                item.save()
+                updated_item = {
+                "cart_item_id": item.cart_item_id,
+                "name": item.catalog_item.catalog_item_name,
+                "creator": item.catalog_item.catalog_item_creator,
+                "type": item.catalog_item.catalog_item_type,
+                "price": str(item.catalog_item.catalog_item_price),
+                "availability": "available" if item.catalog_item.catalog_item_availability else "unavailable",
+                "image": item.catalog_item.catalog_item_image_url,
+                "quantity": item.cart_item_quantity
+            }
+            else:
+                return JsonResponse({"message": "Quantity cannot be lower than 1."})
+            return JsonResponse(updated_item)
+        except CartItem.DoesNotExist:
+            return JsonResponse({"error": "Item not found."}, status=404)
     return JsonResponse({"error": "Invalid request method."}, status=400)

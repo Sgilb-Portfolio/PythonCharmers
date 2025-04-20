@@ -11,3 +11,4 @@ from .sponsoruser import SponsorUser
 from .driversponsor import DriverSponsor
 from .catologitem import CatalogItem
 from .sponsorcatalogitem import SponsorCatalogItem
+from .cartitem import CartItem

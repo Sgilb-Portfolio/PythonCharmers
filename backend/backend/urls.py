@@ -38,6 +38,8 @@ from api.views import update_sponsor_rules
 from api.views import get_driver_sponsors
 from api.views import sponsor_catalog_add
 from api.views import get_sponsor_catalog_items
+from api.views import add_to_cart
+from api.views import get_cart_items, remove_cart_item, increase_cart_quantity, decrease_cart_quantity
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -71,4 +73,9 @@ urlpatterns = [
     path("api/get-driver-sponsors/", get_driver_sponsors, name="get-driver-sponsors"),
     path("api/sponsor-catalog-add/", sponsor_catalog_add, name="sponsor-catalog-add"),
     path('api/get-sponsor-catalog-items/<int:sponsor_id>/', get_sponsor_catalog_items, name='get-sponsor-catalog-items'),
+    path('api/add-to-cart/', add_to_cart, name='add-to-cart'),
+    path('api/cart/<str:username>/', get_cart_items, name='get-cart-items'),
+    path('api/cart/<int:item_id>/remove/', remove_cart_item, name='remove-cart-item'),
+    path('api/cart/<int:item_id>/increase/', increase_cart_quantity, name='increase-cart-quantity'),
+    path('api/cart/<int:item_id>/decrease/', decrease_cart_quantity, name='decrease-cart-quantity'),
 ]

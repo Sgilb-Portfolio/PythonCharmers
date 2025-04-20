@@ -15,6 +15,7 @@ function Catalog() {
     const [selectedCatalog, setSelectedCatalog] = useState(null);
     const [loadingCatalogs, setLoadingCatalogs] = useState(true);
     const user = localStorage.getItem("user");
+    const [currSponsor, setCurrSponsor] = useState(null);
 
     const saveSearchHistory = (term) => {
         let history = JSON.parse(localStorage.getItem("searchHistory")) || [];
@@ -75,6 +76,7 @@ function Catalog() {
             const data = await response.json();
             if (data.items) {
                 setItems(data.items);
+                setCurrSponsor(catalogId);
                 setError(null);
             } else {
                 setError("No items found.");
@@ -116,23 +118,58 @@ function Catalog() {
         }
     };
 
-    const addToCart = (item) => {
-        setCart((prevCart) => {
-            const updatedCart = [...prevCart];
-            const existingItem = updatedCart.find(cartItem => cartItem.name === item.name);
-            if (existingItem) {
-                updatedCart = updatedCart.map(cartItem =>
-                    cartItem.name === item.name
-                        ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                        : cartItem
-                );
+    const addToCart = async (item) => {
+    
+        if (!user) {
+            alert("You must be logged in to add items to the cart.");
+            return;
+        }
+    
+        // Create the cart item payload
+        const cartItem = {
+            account_username: user,
+            sponsor_id: currSponsor,
+            catalog_item_id: item.item_id,
+            cart_item_quantity: 1,
+        };
+    
+        try {
+            const response = await fetch("http://localhost:8000/api/add-to-cart/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("IdToken")}`,
+                },
+                body: JSON.stringify(cartItem),
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                setCart((prevCart) => {
+                    const updatedCart = [...prevCart];
+                    const existingItem = updatedCart.find(cartItem => cartItem.catalog_item_id === item.item_id);
+                    if (existingItem) {
+                        updatedCart.map(cartItem =>
+                            cartItem.catalog_item_id === item.item_id
+                                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                                : cartItem
+                        );
+                    } else {
+                        updatedCart.push({ ...cartItem, quantity: 1 });
+                    }
+                    localStorage.setItem("cart", JSON.stringify(updatedCart));
+                    return updatedCart;
+                });
+    
+                alert("Item added to cart.");
             } else {
-                updatedCart.push({ ...item, quantity: 1 });
+                alert("Failed to add item to cart. Please try again.");
             }
-
-            localStorage.setItem("cart", JSON.stringify(updatedCart));
-            return updatedCart;
-        });
+        } catch (error) {
+            console.error("Error adding item to cart:", error);
+            alert("An error occurred while adding the item to the cart.");
+        }
     };
 
     return (

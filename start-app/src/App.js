@@ -24,7 +24,7 @@ import CatalogEdit from "./pages/CatalogEdit";
 
 function App() {
   const navigate = useNavigate();
-  const INACTIVITY_LIMIT = 1 * 60 * 1000;
+  const INACTIVITY_LIMIT = 15 * 60 * 1000;
   let inactivityTimer;
 
   useEffect(() => {

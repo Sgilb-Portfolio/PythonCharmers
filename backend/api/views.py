@@ -771,8 +771,11 @@ def add_to_cart(request):
 def get_cart_items(request, username):
     if request.method == "GET":
         try:
+            sponsor_id = request.GET.get("sponsor_id")
             cart_items = CartItem.objects.filter(account__account_username=username)
             items = []
+            if sponsor_id:
+                cart_items = cart_items.filter(sponsor=sponsor_id)
             for item in cart_items:
                 catalog = item.catalog_item
                 items.append({
@@ -842,7 +845,17 @@ def decrease_cart_quantity(request, item_id):
                 "quantity": item.cart_item_quantity
             }
             else:
-                return JsonResponse({"message": "Quantity cannot be lower than 1."})
+                updated_item = {
+                "cart_item_id": item.cart_item_id,
+                "name": item.catalog_item.catalog_item_name,
+                "creator": item.catalog_item.catalog_item_creator,
+                "type": item.catalog_item.catalog_item_type,
+                "price": str(item.catalog_item.catalog_item_price),
+                "availability": "available" if item.catalog_item.catalog_item_availability else "unavailable",
+                "image": item.catalog_item.catalog_item_image_url,
+                "quantity": item.cart_item_quantity
+                }
+                return JsonResponse(updated_item)
             return JsonResponse(updated_item)
         except CartItem.DoesNotExist:
             return JsonResponse({"error": "Item not found."}, status=404)

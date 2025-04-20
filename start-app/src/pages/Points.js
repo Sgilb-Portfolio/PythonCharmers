@@ -11,6 +11,7 @@ function Points() {
     const [reasonInputs, setReasonInputs] = useState({}); // New state for reason dropdowns
     const [notification, setNotification] = useState({ show: false, message: "", type: "" });
     const [updating, setUpdating] = useState(null);
+    const user = localStorage.getItem("user");
 
     // Define common reasons for point changes
     const commonReasons = [
@@ -49,7 +50,7 @@ function Points() {
     const fetchDrivers = async () => {
         try {
             //const response = await fetch("http://44.202.51.190:8000/api/get-points/");
-            const response = await fetch("http://localhost:8000/api/get-points/");
+            const response = await fetch(`http://localhost:8000/api/get-points/?username=${user}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch data");
             }
@@ -146,7 +147,11 @@ function Points() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, points: pointsToChange }),
+                body: JSON.stringify({ 
+                    username, 
+                    points: pointsToChange,
+                    sponsor_user: user
+                 }),
             });
 
             const data = await response.json();

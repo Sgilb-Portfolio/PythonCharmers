@@ -256,10 +256,19 @@ def verify_mfa(request):
 
 @csrf_exempt
 def get_points(request):
-    """Returns a list of all drivers with their points"""
+    """Returns a list of all drivers with their points for a specific sponsor"""
     if request.method == "GET":
-        drivers = Points.objects.all().values("driver_id", "driver_username", "driver_points")
-        return JsonResponse({"drivers": list(drivers)})
+        username = request.GET.get("username")
+        if not username:
+            return JsonResponse({"error": "Sponsor username is required"}, status=400)
+        try:
+            account = Account.objects.get(account_username=username)
+            sponsorUser = SponsorUser.objects.get(account_id=account.account_id)
+            sponsor = Sponsor.objects.get(sponsor_id=sponsorUser.sponsor_id)
+            drivers = Points.objects.filter(sponsor_id=sponsor.sponsor_id).values("driver_id", "driver_username", "driver_points")
+            return JsonResponse({"drivers": list(drivers)})
+        except Sponsor.DoesNotExist:
+            return JsonResponse({"error": "Sponsor not found"}, status=404)
 
 
 @csrf_exempt
@@ -270,12 +279,14 @@ def update_points(request):
             data = json.loads(request.body)
             username = data.get("username")
             points_to_add = data.get("points", 0)
-
-            driver = Points.objects.get(driver_username=username)
-            driver.driver_points += points_to_add
-            driver.save()
-
-            return JsonResponse({"message": "Points updated successfully", "new_points": driver.driver_points})
+            sponsor_user = data.get("sponsor_user")
+            account = Account.objects.get(account_username=sponsor_user)
+            sponsorUser = SponsorUser.objects.get(account_id=account.account_id)
+            sponsor = Sponsor.objects.get(sponsor_id=sponsorUser.sponsor_id)
+            points = Points.objects.get(driver_username=username, sponsor_id=sponsor.sponsor_id)
+            points.driver_points += points_to_add
+            points.save()
+            return JsonResponse({"message": "Points updated successfully", "new_points": points.driver_points})
         except Points.DoesNotExist:
             return JsonResponse({"error": "Driver not found"}, status=404)
         except Exception as e:
@@ -387,8 +398,6 @@ def audit_logs_view(request):
     except Exception as e:
         print(f'Error fetching logs: {e}')
         return JsonResponse({'error': 'Failed to fetch logs from CloudWatch'}, status=500)
-
-# Add this to your views.py file
 
 @csrf_exempt
 def get_driver_points_by_username(request, username):

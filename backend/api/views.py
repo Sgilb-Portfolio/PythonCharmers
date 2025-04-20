@@ -30,6 +30,9 @@ from .models import DriverSponsor
 from .models import CatalogItem
 from .models import SponsorCatalogItem
 from .models import CartItem
+from .models import Purchase
+from .models import PurchaseSummary
+from uuid import uuid4
 
 MAX_ATTEMPTS = 3
 LOCKOUT_DURATION = timedelta(minutes=1)
@@ -869,3 +872,52 @@ def decrease_cart_quantity(request, item_id):
         except CartItem.DoesNotExist:
             return JsonResponse({"error": "Item not found."}, status=404)
     return JsonResponse({"error": "Invalid request method."}, status=400)
+
+@csrf_exempt
+def complete_purchase(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            sponsor_id = data.get('sponsor_id')
+            name = data.get('name')
+            address = data.get('address')
+            account = Account.objects.get(account_username=username)
+            if not username or not sponsor_id or not name or not address:
+                return JsonResponse({'error': 'Missing required fields'}, status=400)
+            purchase_group_id = str(uuid4())
+            cart_items = data.get('cart', [])
+            if not cart_items:
+                return JsonResponse({'error': 'No items in cart'}, status=400)
+            total_purchase_amount = 0
+            for item in cart_items:
+                cart_item_id = item.get('cart_item_id')
+                cart_item = CartItem.objects.get(cart_item_id=cart_item_id)
+                catalog_item = CatalogItem.objects.get(catalog_item_id=cart_item.catalog_item_id)
+                purchase_quantity = int(item.get('quantity', 1))
+                purchase_price = float(item.get('price'))
+                purchase = Purchase(
+                    purchase_group_id=purchase_group_id,
+                    sponsor_id=sponsor_id,
+                    catalog_item_id=catalog_item.catalog_item_id,
+                    account_id=account.account_id,
+                    purchase_quantity=purchase_quantity,
+                    purchase_price=purchase_price
+                )
+                purchase.save()
+                total_purchase_amount += purchase_price * purchase_quantity
+            purchase_summary = PurchaseSummary(
+                purchase_group_id=purchase_group_id,
+                account_id=account.account_id,
+                sponsor_id=sponsor_id,
+                purchase_summary_total=total_purchase_amount,
+                purchase_summary_name=name,
+                address=address
+            )
+            purchase_summary.save()
+            return JsonResponse({'message': 'Purchase completed successfully'}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)

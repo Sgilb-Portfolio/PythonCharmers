@@ -40,6 +40,7 @@ from api.views import sponsor_catalog_add
 from api.views import get_sponsor_catalog_items
 from api.views import add_to_cart
 from api.views import get_cart_items, remove_cart_item, increase_cart_quantity, decrease_cart_quantity
+from api.views import complete_purchase
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -78,4 +79,5 @@ urlpatterns = [
     path('api/cart/<int:item_id>/remove/', remove_cart_item, name='remove-cart-item'),
     path('api/cart/<int:item_id>/increase/', increase_cart_quantity, name='increase-cart-quantity'),
     path('api/cart/<int:item_id>/decrease/', decrease_cart_quantity, name='decrease-cart-quantity'),
+    path('api/complete-purchase/', complete_purchase, name='complete-purchase'),
 ]

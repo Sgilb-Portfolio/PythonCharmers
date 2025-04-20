@@ -251,7 +251,12 @@ function Cart() {
                                                 fontWeight: "bold",
                                                 transition: "background-color 0.3s"
                                             }}
-                                            onClick={() => navigate("/purchase")}
+                                            onClick={() => navigate("/purchase", {
+                                                state: {
+                                                    selectedSponsor: selectedSponsor,
+                                                    ptAmt: ptAmt
+                                                }
+                                            })}
                                         >
                                             Proceed to Purchase
                                         </button>

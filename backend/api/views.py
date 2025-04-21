@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from .models import AboutData
 from django.views.decorators.csrf import csrf_exempt   
 import jwt
+from django.contrib.auth.hashers import make_password
 from datetime import datetime, timedelta
 from rest_framework_simplejwt.tokens import RefreshToken 
 from django.conf import settings  # For SECRET_KEY
@@ -74,11 +75,13 @@ def create_account(request):
             if Account.objects.filter(account_username=username).exists():
                 return JsonResponse({'error': 'Username already taken'}, status=400)
 
+            hashed_password = make_password(password)
+
             # Create account with default values
             account = Account.objects.create(
                 account_type="Driver",  # Default type
                 account_username=username,
-                account_password=password  # In production, hash this before saving
+                account_password=hashed_password
             )
 
             return JsonResponse({'message': 'Account created', 'account_id': account.account_id}, status=201)
@@ -191,9 +194,11 @@ def reset_password(request):
 
         if "error" in cognito_response:
             return JsonResponse(cognito_response, status=400)
+        
+        hashed_password = make_password(new_password)
 
         # Update password in local database
-        user.account_password = new_password
+        user.account_password = hashed_password
         user.save()
 
         return JsonResponse({"message": "Password reset successful"}, status=200)

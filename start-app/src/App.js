@@ -19,10 +19,14 @@ import RoleProtection from "./components/RoleProtection";
 import Protection from "./components/Protection";
 import AuditLogs from "./pages/AuditLogs";
 import Reports from "./pages/Reports";
+import SponsorApplications from "./pages/SponsorApplications";
+import SponsorEdit from "./pages/SponsorEdit";
+import DriverSponsors from "./pages/DriverSponsors";
+import CatalogEdit from "./pages/CatalogEdit";
 
 function App() {
   const navigate = useNavigate();
-  const INACTIVITY_LIMIT = 1 * 60 * 1000;
+  const INACTIVITY_LIMIT = 15 * 60 * 1000;
   let inactivityTimer;
 
   useEffect(() => {
@@ -75,8 +79,13 @@ function App() {
         <Route path="/purchase" element={<Protection><Purchase /></Protection>} />
         <Route path="/audit-logs" element={<RoleProtection allowedRoles={["admin"]}><AuditLogs /></RoleProtection>}/>
         <Route path="/reports" element={<RoleProtection allowedRoles={["admin","sponsor"]}><Reports /></RoleProtection>}/>
+        <Route path="/sponsor-applications" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorApplications /></RoleProtection>} />
+        <Route path="/sponsor-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorEdit /></RoleProtection>} />
+        <Route path="/my-sponsors" element={<Protection><DriverSponsors /></Protection>} />
+        <Route path="/catalog-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><CatalogEdit /></RoleProtection>} />
       </Routes>
     </ViewAsProvider>
+
   );
 }
 

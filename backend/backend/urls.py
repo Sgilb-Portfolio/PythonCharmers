@@ -25,9 +25,24 @@ from api.views import forgot_password
 from api.views import verify_mfa
 from api.views import get_profile, update_profile
 from api.views import audit_logs_view
-from api.views import get_driver_points_by_username
+from api.views import get_driver_points_by_usernam
 from api.views import view_as_driver
 from api.views import reports_view
+from api.views import get_sponsors, get_sponsor_details
+from api.views import apply_sponsor
+from api.views import get_sponsor_applications
+from api.views import update_application_status
+from api.views import get_driver_applications
+from api.views import confirm_join_sponsor
+from api.views import cancel_application
+from api.views import get_sponsor_details_by_account
+from api.views import update_sponsor_rules
+from api.views import get_driver_sponsors
+from api.views import sponsor_catalog_add
+from api.views import get_sponsor_catalog_items
+from api.views import add_to_cart
+from api.views import get_cart_items, remove_cart_item, increase_cart_quantity, decrease_cart_quantity
+from api.views import complete_purchase
 
 urlpatterns = [
     path('api/about/', about, name='about'),
@@ -50,4 +65,23 @@ urlpatterns = [
     path('api/get-driver-points/<str:username>', get_driver_points_by_username, name='get_driver_points_by_username'),
     path('api/view-as-driver/<int:driver_id>', view_as_driver),
     path('api/reports', reports_view, name="reports"),
+    path('api/get-sponsors/', get_sponsors, name='get-sponsors'),
+    path('api/get-sponsor-details/<int:sponsor_id>/', get_sponsor_details, name='get-sponsor-details'),
+    path('api/apply-sponsor/', apply_sponsor, name='apply-sponsor'),
+    path('api/get-sponsor-applications/', get_sponsor_applications, name='get-sponsor-applications'),
+    path('api/update-application-status/', update_application_status, name='update-application-status'),
+    path('api/get-driver-applications/', get_driver_applications, name='get-driver-applications'),
+    path('api/confirm-join-sponsor/', confirm_join_sponsor, name='confirm-join-sponsor'),
+    path('api/cancel-application/', cancel_application, name='cancel-application'),
+    path("api/get-sponsor-details-by-account/", get_sponsor_details_by_account, name="get-sponsor-details-by-account"),
+    path("api/update-sponsor-rules/", update_sponsor_rules, name="update-sponsor-rules"),
+    path("api/get-driver-sponsors/", get_driver_sponsors, name="get-driver-sponsors"),
+    path("api/sponsor-catalog-add/", sponsor_catalog_add, name="sponsor-catalog-add"),
+    path('api/get-sponsor-catalog-items/<int:sponsor_id>/', get_sponsor_catalog_items, name='get-sponsor-catalog-items'),
+    path('api/add-to-cart/', add_to_cart, name='add-to-cart'),
+    path('api/cart/<str:username>/', get_cart_items, name='get-cart-items'),
+    path('api/cart/<int:item_id>/remove/', remove_cart_item, name='remove-cart-item'),
+    path('api/cart/<int:item_id>/increase/', increase_cart_quantity, name='increase-cart-quantity'),
+    path('api/cart/<int:item_id>/decrease/', decrease_cart_quantity, name='decrease-cart-quantity'),
+    path('api/complete-purchase/', complete_purchase, name='complete-purchase'),
 ]

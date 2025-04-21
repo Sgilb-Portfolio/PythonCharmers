@@ -5,10 +5,18 @@ import { useViewAs } from "../components/ViewAsContext"; // ✅ NEW
 
 const Header = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [pointsDropdownOpen, setPointsDropdownOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
 
-    const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+        setPointsDropdownOpen(false);
+    };
+    const togglePointsDropdown = () => {
+        setPointsDropdownOpen(!pointsDropdownOpen);
+        setDropdownOpen(false);
+      };
     const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
     const idToken = localStorage.getItem("IdToken") || null;
@@ -25,6 +33,9 @@ const Header = () => {
 
     const [driverPoints, setDriverPoints] = useState(null);
 
+    const [sponsorPoints, setSponsorPoints] = useState([]);
+    const username = localStorage.getItem("user");
+
     useEffect(() => {
         if (isDriver && username) {
             fetchDriverPoints(username);
@@ -33,10 +44,11 @@ const Header = () => {
 
     const fetchDriverPoints = async (username) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
+            //const response = await fetch(`http://localhost:8000/api/get-driver-points/${username}`);
+            const response = await fetch(`http://44.202.51.190:8000/api/get-driver-points/${username}`);
             if (response.ok) {
                 const data = await response.json();
-                setDriverPoints(data.points);
+                setSponsorPoints(data.sponsor_points || []);
             }
         } catch (error) {
             console.error("Error fetching driver points:", error);
@@ -109,13 +121,77 @@ const Header = () => {
                 justifyContent: "center",
                 flex: "1"
             }}>
-                <Link to="/" style={linkStyle}>Home</Link>
-                <Link to="/about" style={linkStyle}>About</Link>
-                {idToken && <Link to="/applications" style={linkStyle}>Applications</Link>}
+                <Link to="/" style={{
+                    margin: "0 10px",
+                    textDecoration: "none",
+                    color: "#ffffff",
+                    fontWeight: "500",
+                    transition: "color 0.2s"
+                }}>Home</Link>
+
+                <Link to="/about" style={{
+                    margin: "0 10px",
+                    textDecoration: "none",
+                    color: "#ffffff",
+                    fontWeight: "500",
+                    transition: "color 0.2s"
+                }}>About</Link>
+
+                {idToken && (userRole === "driver") && (
+                    <Link to="/applications" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Applications</Link>
+                )}
+
                 {(userRole === "sponsor" || userRole === "admin") && (
                     <Link to="/points" style={linkStyle}>Manage Points</Link>
                 )}
-                {idToken && <Link to="/catalog" style={linkStyle}>Catalog</Link>}
+
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/sponsor-applications" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Applications</Link>
+                )}
+
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/sponsor-edit" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Sponsor Info</Link>
+                )}
+
+                {(userRole === "driver") && (
+                    <Link to="/catalog" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Catalog</Link>
+                )}
+
+                {(userRole === "sponsor" || userRole === "admin") && (
+                    <Link to="/catalog-edit" style={{
+                        margin: "0 10px",
+                        textDecoration: "none",
+                        color: "#ffffff",
+                        fontWeight: "500",
+                        transition: "color 0.2s"
+                    }}>Catalog</Link>
+                )}
+                
+                {/* Admin-only Audit Logs Link */}
                 {idToken && isAdmin && (
                     <Link to="/audit-logs" style={linkStyle}>Audit Logs</Link>
                 )}
@@ -133,22 +209,52 @@ const Header = () => {
                 flex: "1",
                 justifyContent: "flex-end"
             }}>
-                {/* ✅ Matching "View as Driver" and "Return" buttons */}
-                {userRole === "sponsor" && !isImpersonating && (
-                    <button onClick={handleImpersonate} style={whiteButton}>
-                        View as Driver 60
-                    </button>
-                )}
-                {isImpersonating && (
-                    <button onClick={stopImpersonation} style={orangeButton}>
-                        Return to Sponsor View
-                    </button>
-                )}
 
-                {idToken && isDriver && driverPoints !== null && (
-                    <Link to="/profile" style={whiteButton}>
-                        <span>Points: {driverPoints}</span>
-                    </Link>
+                {/* Display driver points if user is a driver - with cart styling */}
+                {idToken && isDriver && sponsorPoints.length > 0 && (
+                    <div style={{ position: "relative" }}>
+                        <div
+                            onClick={() => togglePointsDropdown(!dropdownOpen)}
+                            style={{
+                                cursor: "pointer",
+                                color: "#ffffff",
+                                fontWeight: "500",
+                                padding: "8px 15px",
+                                borderRadius: "20px",
+                                border: "1px solid #ffffff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px"
+                            }}
+                        >
+                            <span>Points</span>
+                            <span>▾</span>
+                        </div>
+                        {pointsDropdownOpen && (
+                            <div style={{
+                                position: "absolute",
+                                top: "45px",
+                                right: 0,
+                                backgroundColor: "#ffffff",
+                                boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+                                borderRadius: "8px",
+                                padding: "10px",
+                                zIndex: 101,
+                                minWidth: "200px"
+                            }}>
+                                {sponsorPoints.map((s, idx) => (
+                                    <div key={idx} style={{
+                                        padding: "8px 10px",
+                                        borderBottom: idx !== sponsorPoints.length - 1 ? "1px solid #eee" : "none",
+                                        color: "#333",
+                                        fontWeight: "500"
+                                    }}>
+                                        {s.sponsor_name}: {s.points}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 )}
 
                 {idToken && (
@@ -176,10 +282,50 @@ const Header = () => {
                             style={{ cursor: "pointer" }}
                         />
                         {dropdownOpen && (
-                            <div style={dropdownStyle}>
-                                <Link to="/profile" style={dropdownItem}>Profile</Link>
-                                <hr style={dividerStyle} />
-                                <button onClick={handleLogout} style={logoutButton}>Logout</button>
+
+                            <div style={{
+                                position: "absolute",
+                                top: "45px",
+                                right: 0,
+                                backgroundColor: "white",
+                                boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
+                                borderRadius: "8px",
+                                width: "180px",
+                                textAlign: "left",
+                                padding: "10px",
+                                zIndex: 101
+                            }}>
+                                <Link to="/profile" style={{
+                                    display: "block",
+                                    padding: "12px 15px",
+                                    textDecoration: "none",
+                                    color: "#333",
+                                    borderRadius: "5px",
+                                    transition: "background-color 0.2s",
+                                    fontWeight: "500"
+                                }}>Profile</Link>
+                                <hr style={{ margin: "5px 0", border: "none", borderTop: "1px solid #eee" }} />
+                                <Link to="/my-sponsors" style={{
+                                    display: "block",
+                                    padding: "12px 15px",
+                                    textDecoration: "none",
+                                    color: "#333",
+                                    borderRadius: "5px",
+                                    transition: "background-color 0.2s",
+                                    fontWeight: "500"
+                                }}>My Sponsors</Link>
+                                <button onClick={handleLogout} style={{
+                                    width: "100%",
+                                    background: "none",
+                                    border: "none",
+                                    color: "#d9534f",
+                                    cursor: "pointer",
+                                    padding: "12px 15px",
+                                    textAlign: "left",
+                                    borderRadius: "5px",
+                                    fontWeight: "500",
+                                    transition: "background-color 0.2s"
+                                }}>Logout</button>
                             </div>
                         )}
                     </div>

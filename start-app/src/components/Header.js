@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
-import { useViewAs } from "../components/ViewAsContext"; // ✅ NEW
+import { useViewAs } from "../components/ViewAsContext"; 
 
 const Header = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -26,15 +26,15 @@ const Header = () => {
     const userRole = localStorage.getItem("userRole");
     const isAdmin = userRole === "admin";
 
-    const { viewAsRole, viewAsUserData, startImpersonation, stopImpersonation } = useViewAs(); // ✅
+    const { viewAsRole, viewAsUserData, startImpersonation, stopImpersonation } = useViewAs(); 
     const isImpersonating = viewAsRole === "driver";
     const isDriver = userRole === "driver" || isImpersonating;
-    //const username = isImpersonating ? viewAsUserData?.username : localStorage.getItem("user");
+    const username = isImpersonating ? viewAsUserData?.username : localStorage.getItem("user");
 
     const [driverPoints, setDriverPoints] = useState(null);
 
     const [sponsorPoints, setSponsorPoints] = useState([]);
-    const username = localStorage.getItem("user");
+    //const username = localStorage.getItem("user");
 
     useEffect(() => {
         if (isDriver && username) {

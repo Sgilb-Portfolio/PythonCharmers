@@ -143,6 +143,7 @@ function Points() {
             
             const response = await fetch("http://44.202.51.190:8000/api/update-points/", {
             //const response = await fetch("http://localhost:8000/api/update-points/", {
+              
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

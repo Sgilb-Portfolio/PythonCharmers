@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { ViewAsProvider } from "./components/ViewAsContext";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Login from "./pages/Login";
@@ -17,6 +18,7 @@ import Purchase from "./pages/Purchase";
 import RoleProtection from "./components/RoleProtection";
 import Protection from "./components/Protection";
 import AuditLogs from "./pages/AuditLogs";
+import Reports from "./pages/Reports";
 import SponsorApplications from "./pages/SponsorApplications";
 import SponsorEdit from "./pages/SponsorEdit";
 import DriverSponsors from "./pages/DriverSponsors";
@@ -59,27 +61,31 @@ function App() {
 }, [navigate]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<Protection><About /></Protection>} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/account-creation" element={<Create />} />
-      <Route path="/applications" element={<Protection><Applications /></Protection>} />
-      <Route path="/help" element={<Help />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/account-confirmation" element={<AccountConfirmation />} />
-      <Route path="/profile" element={<Protection><Profile /></Protection>} />
-      <Route path="/points" element={<RoleProtection allowedRoles={["admin","sponsor"]}><Points /></RoleProtection>} />
-      <Route path="/catalog" element={<Protection><Catalog /></Protection>} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/cart" element={<Protection><Cart /></Protection>} />
-      <Route path="/purchase" element={<Protection><Purchase /></Protection>} />
-      <Route path="/audit-logs" element={<RoleProtection allowedRoles={["admin"]}><AuditLogs /></RoleProtection>}/>
-      <Route path="/sponsor-applications" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorApplications /></RoleProtection>} />
-      <Route path="/sponsor-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorEdit /></RoleProtection>} />
-      <Route path="/my-sponsors" element={<Protection><DriverSponsors /></Protection>} />
-      <Route path="/catalog-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><CatalogEdit /></RoleProtection>} />
-    </Routes>
+    <ViewAsProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<Protection><About /></Protection>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/account-creation" element={<Create />} />
+        <Route path="/applications" element={<Protection><Applications /></Protection>} />
+        <Route path="/help" element={<Help />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/account-confirmation" element={<AccountConfirmation />} />
+        <Route path="/profile" element={<Protection><Profile /></Protection>} />
+        <Route path="/points" element={<RoleProtection allowedRoles={["admin","sponsor"]}><Points /></RoleProtection>} />
+        <Route path="/catalog" element={<Protection><Catalog /></Protection>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/cart" element={<Protection><Cart /></Protection>} />
+        <Route path="/purchase" element={<Protection><Purchase /></Protection>} />
+        <Route path="/audit-logs" element={<RoleProtection allowedRoles={["admin"]}><AuditLogs /></RoleProtection>}/>
+        <Route path="/reports" element={<RoleProtection allowedRoles={["admin","sponsor"]}><Reports /></RoleProtection>}/>
+        <Route path="/sponsor-applications" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorApplications /></RoleProtection>} />
+        <Route path="/sponsor-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><SponsorEdit /></RoleProtection>} />
+        <Route path="/my-sponsors" element={<Protection><DriverSponsors /></Protection>} />
+        <Route path="/catalog-edit" element={<RoleProtection allowedRoles={["admin","sponsor"]}><CatalogEdit /></RoleProtection>} />
+      </Routes>
+    </ViewAsProvider>
+
   );
 }
 

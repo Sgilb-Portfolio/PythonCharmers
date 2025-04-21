@@ -3,7 +3,7 @@
 
 ## Overview
 **Good Driver Incentive Program** is a web application designed to manage a Good Driver Incentive Program.  
-It uses a modern tech stack that combines a Django backend with a React frontend to deliver a smooth and efficient user experience.
+It uses a modern tech stack that combines a Django backend with a React frontend to deliver a smooth and efficient user experience, completed using a scrum style.
 
 ---
 
@@ -12,11 +12,10 @@ It uses a modern tech stack that combines a Django backend with a React frontend
 ### Backend
 - **Django** – A high-level Python web framework that encourages rapid development and clean, pragmatic design.
 - **Django REST Framework (DRF)** – A powerful toolkit for building Web APIs with Django.
-- **PostgreSQL** – An open-source, object-relational database system.
+- **MySQL** – An open-source, relational database system.
 
 ### Frontend
 - **React** – A JavaScript library for building user interfaces.
-- **Vite** – A fast and modern build tool optimized for frontend development.
 - **Tailwind CSS** – A utility-first CSS framework for creating custom designs directly in your markup.
 
 ---
@@ -39,7 +38,6 @@ It uses a modern tech stack that combines a Django backend with a React frontend
 ### Frontend (React)
 - `react`
 - `react-dom`
-- `vite`
 - `tailwindcss`
 
 ---
@@ -48,5 +46,4 @@ It uses a modern tech stack that combines a Django backend with a React frontend
 - [Django](https://www.djangoproject.com/start/)
 - [Django REST Framework](https://www.django-rest-framework.org/)
 - [React](https://react.dev/)
-- [Vite](https://vitejs.dev/)
 - [Tailwind CSS](https://tailwindcss.com/docs)

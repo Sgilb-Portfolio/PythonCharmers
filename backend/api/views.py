@@ -552,7 +552,7 @@ def reports_view(request):
     except Exception as e:
         print(f'Error generating report: {e}')
         return JsonResponse({'error': f'Failed to generate report: {str(e)}'}, status=500)
-=======
+
 @csrf_exempt    
 def get_sponsors(request):
     sponsors = Sponsor.objects.all()

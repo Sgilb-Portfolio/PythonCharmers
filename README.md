@@ -2,7 +2,7 @@
 **Good Driver Incentive Program**
 
 ## Overview
-**PythonCharmers** is a web application designed to manage a Good Driver Incentive Program.  
+**Good Driver Incentive Program** is a web application designed to manage a Good Driver Incentive Program.  
 It uses a modern tech stack that combines a Django backend with a React frontend to deliver a smooth and efficient user experience.
 
 ---

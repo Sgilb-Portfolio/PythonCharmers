@@ -29,7 +29,7 @@ const Header = () => {
     const { viewAsRole, viewAsUserData, startImpersonation, stopImpersonation } = useViewAs(); // ✅
     const isImpersonating = viewAsRole === "driver";
     const isDriver = userRole === "driver" || isImpersonating;
-    const username = isImpersonating ? viewAsUserData?.username : localStorage.getItem("user");
+    //const username = isImpersonating ? viewAsUserData?.username : localStorage.getItem("user");
 
     const [driverPoints, setDriverPoints] = useState(null);
 

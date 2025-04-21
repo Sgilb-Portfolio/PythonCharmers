@@ -55,10 +55,10 @@ function Reports() {
       try {
         // Use the same log groups as audit logs
         const responses = await Promise.all([
-          // fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
-          fetch('http://localhost:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
-          // fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
-          fetch('http://localhost:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
+           fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
+          //fetch('http://localhost:8000/api/audit-logs?logGroup=/driver-points/audit-logs', {signal}),
+           fetch('http://44.202.51.190:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
+          //fetch('http://localhost:8000/api/audit-logs?logGroup=Team06-Cognito-Cloudtrail-AuditLogs', {signal}),
         ]);
         
         const results = await Promise.all(responses.map(res => res.json()));

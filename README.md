@@ -32,7 +32,6 @@ It uses a modern tech stack that combines a Django backend with a React frontend
 ### Backend (Django)
 - `django`
 - `djangorestframework`
-- `psycopg2`
 - `corsheaders`
 
 ### Frontend (React)

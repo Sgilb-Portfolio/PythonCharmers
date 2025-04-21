@@ -25,7 +25,7 @@ from api.views import forgot_password
 from api.views import verify_mfa
 from api.views import get_profile, update_profile
 from api.views import audit_logs_view
-from api.views import get_driver_points_by_usernam
+from api.views import get_driver_points_by_username
 from api.views import view_as_driver
 from api.views import reports_view
 from api.views import get_sponsors, get_sponsor_details

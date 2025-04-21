@@ -210,6 +210,17 @@ const Header = () => {
                 flex: "1",
                 justifyContent: "flex-end"
             }}>
+                {/* Matching "View as Driver" and "Return" buttons */}
+                {userRole === "sponsor" && !isImpersonating && (
+                    <button onClick={handleImpersonate} style={whiteButton}>
+                        View as Driver 60
+                    </button>
+                )}
+                {isImpersonating && (
+                    <button onClick={stopImpersonation} style={orangeButton}>
+                        Return to Sponsor View
+                    </button>
+                )}
 
                 {/* Display driver points if user is a driver - with cart styling */}
                 {idToken && isDriver && sponsorPoints.length > 0 && (

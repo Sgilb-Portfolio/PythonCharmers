@@ -7,8 +7,8 @@ function ViewAsButton({ driverId, driverName }) {
   if (currentUserRole !== "sponsor") return null;
 
   const handleClick = () => {
-    // fetch(`http://44.202.51.190:8000/api/view-as-driver/${driverId}`, {
-    fetch(`http://localhost:8000/api/view-as-driver/${driverId}`, {
+    fetch(`http://44.202.51.190:8000/api/view-as-driver/${driverId}`, {
+    // fetch(`http://localhost:8000/api/view-as-driver/${driverId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('IdToken')}`,
       },

@@ -22,7 +22,7 @@ It uses a modern tech stack that combines a Django backend with a React frontend
 
 ## Development Tools
 - **npm** – JavaScript package manager used for managing frontend dependencies.
-- **Python 3.x** – The programming language used for backend development.
+- **Python 3.13** – The programming language used for backend development.
 - **Git** – A version control system for tracking codebase changes.
 
 ---

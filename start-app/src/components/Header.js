@@ -69,7 +69,8 @@ const Header = () => {
     };
 
     const handleImpersonate = () => {
-        fetch(`http://localhost:8000/api/view-as-driver/60`, {
+        //fetch(`http://localhost:8000/api/view-as-driver/60`, {
+        fetch(`http://44.202.51.190:8000/api/view-as-driver/60`, {
             headers: {
                 Authorization: `Bearer ${idToken}`,
             },
